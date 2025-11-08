@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pit Stop JadEx</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,11 +13,8 @@
       margin: 0;
       padding: 20px;
     }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    .btn-scan {
+    h1 { text-align: center; color: #333; }
+    .btn-scan, .btn-finalizar {
       display: block;
       margin: 20px auto;
       padding: 12px 20px;
@@ -27,12 +25,8 @@
       border-radius: 10px;
       cursor: pointer;
     }
-    .btn-scan:hover { background: #0056b3; }
-    #reader {
-      width: 300px;
-      margin: 20px auto;
-      display: none;
-    }
+    .btn-scan:hover, .btn-finalizar:hover { background: #0056b3; }
+    #reader { width: 300px; margin: 20px auto; display: none; }
     .produto-info {
       text-align: center;
       background: #fff;
@@ -80,10 +74,14 @@
       text-align: right;
       margin-top: 10px;
     }
-    #pix {
-      display: block;
-      margin: 20px auto;
-      width: 200px;
+    #pixArea {
+      display: none;
+      text-align: center;
+      margin-top: 30px;
+    }
+    #pixQr {
+      width: 250px;
+      margin: 15px auto;
     }
     .produto-imagem {
       width: 50px;
@@ -118,8 +116,13 @@
 
   <div class="total">Total: R$ <span id="total">0.00</span></div>
 
-  <h3 style="text-align:center;">Pague com Pix:</h3>
-  <img id="pix" src="imagens/pix-qrcode.png" alt="QR Code Pix">
+  <button class="btn-finalizar" id="btnFinalizar">💳 Finalizar Compra</button>
+
+  <div id="pixArea">
+    <h3>Pague com Pix:</h3>
+    <canvas id="pixQr"></canvas>
+    <p id="pixCode"></p>
+  </div>
 
   <script>
     const produtos = {
@@ -129,4 +132,104 @@
       "REF004": { nome: "Guaraná Antártica Lata 350 ml", preco: 4.00, imagem: "imagens/ref-guarana.jpg" },
       "REF005": { nome: "Guaraná Antártica Zero Lata 350 ml", preco: 4.00, imagem: "imagens/ref-guarana-zero.jpg" },
       "REF006": { nome: "Sukita Laranja Lata 350 ml", preco: 3.70, imagem: "imagens/ref-sukita.jpg" },
-      "SAL001
+      "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "imagens/salgadinho.jpg" }
+    };
+
+    const chavePix = "sua_chave_pix_aqui@exemplo.com"; // 👉 coloque sua chave Pix aqui
+    const nomeLoja = "Pit Stop JadEx";
+
+    let total = 0;
+    let html5QrCode = null;
+    let produtoAtual = null;
+    let bloqueioLeitura = false;
+
+    function adicionarProduto(codigo, qtd = 1) {
+      const produto = produtos[codigo];
+      if (!produto) {
+        alert("Produto não encontrado!");
+        return;
+      }
+
+      const linha = document.createElement("tr");
+      linha.innerHTML = `
+        <td><img src="${produto.imagem}" class="produto-imagem"> ${produto.nome}</td>
+        <td>${qtd}</td>
+        <td>R$ ${(produto.preco * qtd).toFixed(2)}</td>
+      `;
+      document.getElementById("cart").appendChild(linha);
+
+      total += produto.preco * qtd;
+      document.getElementById("total").textContent = total.toFixed(2);
+    }
+
+    function mostrarProduto(codigo) {
+      const produto = produtos[codigo];
+      if (!produto) return;
+      produtoAtual = codigo;
+      document.getElementById("produtoImg").src = produto.imagem;
+      document.getElementById("produtoNome").textContent = produto.nome;
+      document.getElementById("produtoPreco").textContent = "Preço: R$ " + produto.preco.toFixed(2);
+      document.getElementById("produtoInfo").style.display = "block";
+    }
+
+    document.getElementById("btnAdicionarQtd").addEventListener("click", () => {
+      const qtd = parseInt(document.getElementById("qtdInput").value);
+      if (produtoAtual && qtd > 0) {
+        adicionarProduto(produtoAtual, qtd);
+        document.getElementById("produtoInfo").style.display = "none";
+        bloqueioLeitura = false;
+      }
+    });
+
+    document.getElementById("btnStartScan").addEventListener("click", async () => {
+      const readerDiv = document.getElementById("reader");
+      readerDiv.style.display = "block";
+      document.getElementById("btnStartScan").style.display = "none";
+
+      html5QrCode = new Html5Qrcode("reader");
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: 200 },
+          (decodedText) => {
+            if (bloqueioLeitura) return;
+            bloqueioLeitura = true;
+
+            const codigo = decodedText.trim();
+            if (produtos[codigo]) {
+              mostrarProduto(codigo);
+            } else {
+              alert("Produto não encontrado!");
+              bloqueioLeitura = false;
+            }
+          }
+        );
+      } catch (err) {
+        console.error("Erro ao abrir câmera:", err);
+        alert("Não foi possível acessar a câmera. Verifique as permissões.");
+      }
+    });
+
+    // Gerar QR Code Pix dinâmico
+    document.getElementById("btnFinalizar").addEventListener("click", () => {
+      if (total <= 0) {
+        alert("Carrinho vazio!");
+        return;
+      }
+
+      const payload = gerarPixPayload(chavePix, total, nomeLoja);
+      document.getElementById("pixArea").style.display = "block";
+      document.getElementById("pixCode").textContent = payload;
+
+      const canvas = document.getElementById("pixQr");
+      QRCode.toCanvas(canvas, payload, { width: 250 });
+    });
+
+    // Gera o código Pix (payload)
+    function gerarPixPayload(chave, valor, nome) {
+      const formattedValue = valor.toFixed(2);
+      return `00020126580014BR.GOV.BCB.PIX0114${chave}520400005303986540${formattedValue}5802BR5913${nome}6009SAO PAULO62100506LOJA`;
+    }
+  </script>
+</body>
+</html>
