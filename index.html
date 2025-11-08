@@ -3,41 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compra Rápida QR</title>
+  <title>Pit Stop JadEx</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
-      background: #f6f8fa;
+      background: linear-gradient(180deg, #f7f9fc 0%, #e4e9f2 100%);
+      color: #333;
     }
-    h1 { text-align: center; }
-    #reader { width: 300px; margin: 20px auto; }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #0078d7;
+    }
+    #reader {
+      width: 280px;
+      margin: 20px auto;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 8px rgba(0,0,0,0.15);
+    }
     table {
       width: 100%;
       margin-top: 10px;
       border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
-    th, td {
-      border-bottom: 1px solid #ccc;
-      padding: 8px;
+    th {
+      background: #0078d7;
+      color: white;
       text-align: left;
+      padding: 10px;
+    }
+    td {
+      border-bottom: 1px solid #eee;
+      padding: 10px;
+      vertical-align: middle;
+    }
+    td img {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 8px;
+    }
+    .produto-info {
+      display: flex;
+      align-items: center;
     }
     .total {
       font-size: 1.3em;
       font-weight: bold;
       text-align: right;
-      margin-top: 10px;
+      margin-top: 15px;
+      color: #222;
     }
     #pix {
       display: block;
       margin: 20px auto;
-      width: 200px;
+      width: 220px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .botao-limpar {
+      background: #ff5555;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: block;
+      margin: 15px auto;
+      font-size: 1em;
+    }
+    .botao-limpar:hover {
+      background: #ff2222;
     }
   </style>
 </head>
 <body>
-  <h1>Compra Rápida QR</h1>
+  <h1>🛒 Pit Stop JadEx</h1>
+  <p style="text-align:center;">Aponte a câmera para o QR Code do produto para adicionar ao carrinho.</p>
 
   <div id="reader"></div>
 
@@ -50,13 +100,16 @@
 
   <div class="total">Total: R$ <span id="total">0.00</span></div>
 
+  <button class="botao-limpar" onclick="limparCarrinho()">🧹 Limpar carrinho</button>
+
   <img id="pix" src="pix-qrcode.png" alt="QR Code Pix">
 
   <script>
+    // 🧃 Produtos cadastrados
     const produtos = {
-      "REF001": { nome: "Refrigerante Lata", preco: 6.00 },
-      "SAL001": { nome: "Salgadinho", preco: 5.00 },
-      "REF002": { nome: "Refrigerante 2L", preco: 10.00 }
+      "REF001": { nome: "Refrigerante Lata", preco: 6.00, imagem: "refrigerante-lata.jpg" },
+      "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" },
+      "REF002": { nome: "Refrigerante 2L", preco: 10.00, imagem: "refrigerante-2l.jpg" }
     };
 
     let total = 0;
@@ -64,17 +117,32 @@
     function adicionarProduto(codigo) {
       const produto = produtos[codigo];
       if (!produto) {
-        alert("Produto não encontrado!");
+        alert("❌ Produto não encontrado!");
         return;
       }
+
       const linha = document.createElement("tr");
-      linha.innerHTML = `<td>${produto.nome}</td><td>R$ ${produto.preco.toFixed(2)}</td>`;
+      linha.innerHTML = `
+        <td>
+          <div class="produto-info">
+            <img src="${produto.imagem}" alt="${produto.nome}">
+            <span>${produto.nome}</span>
+          </div>
+        </td>
+        <td>R$ ${produto.preco.toFixed(2)}</td>
+      `;
       document.getElementById("cart").appendChild(linha);
       total += produto.preco;
       document.getElementById("total").textContent = total.toFixed(2);
     }
 
-    // Inicializa o leitor de QR Code
+    function limparCarrinho() {
+      document.getElementById("cart").innerHTML = "";
+      total = 0;
+      document.getElementById("total").textContent = "0.00";
+    }
+
+    // 📷 Inicializa o leitor de QR Code
     const html5QrCode = new Html5Qrcode("reader");
     html5QrCode.start(
       { facingMode: "environment" },
@@ -82,7 +150,10 @@
       (decodedText) => {
         adicionarProduto(decodedText.trim());
       }
-    );
+    ).catch(err => {
+      console.error("Erro ao iniciar a câmera:", err);
+      alert("Não foi possível acessar a câmera. Verifique as permissões.");
+    });
   </script>
 </body>
 </html>
