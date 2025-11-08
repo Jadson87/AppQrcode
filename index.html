@@ -7,81 +7,42 @@
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
       background: linear-gradient(180deg, #f7f9fc 0%, #e4e9f2 100%);
       color: #333;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-      color: #0078d7;
-    }
+    h1 { text-align: center; color: #0078d7; margin-bottom: 10px; }
     #reader {
-      width: 280px;
-      margin: 20px auto;
-      border-radius: 10px;
-      overflow: hidden;
+      width: 280px; margin: 20px auto;
+      border-radius: 10px; overflow: hidden;
       box-shadow: 0 0 8px rgba(0,0,0,0.15);
     }
     table {
-      width: 100%;
-      margin-top: 10px;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
+      width: 100%; margin-top: 10px;
+      border-collapse: collapse; background: white;
+      border-radius: 10px; overflow: hidden;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
-    th {
-      background: #0078d7;
-      color: white;
-      text-align: left;
-      padding: 10px;
+    th { background: #0078d7; color: white; text-align: left; padding: 10px; }
+    td { border-bottom: 1px solid #eee; padding: 10px; vertical-align: middle; }
+    td img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; margin-right: 8px; }
+    .produto-info { display: flex; align-items: center; }
+    .total { font-size: 1.3em; font-weight: bold; text-align: right; margin-top: 15px; color: #222; }
+    button {
+      background: #0078d7; color: white; border: none;
+      padding: 10px 16px; border-radius: 8px; cursor: pointer;
+      display: block; margin: 15px auto; font-size: 1em;
     }
-    td {
-      border-bottom: 1px solid #eee;
-      padding: 10px;
-      vertical-align: middle;
+    button:hover { background: #005fa3; }
+    .botao-limpar { background: #ff5555; }
+    .botao-limpar:hover { background: #ff2222; }
+    #pagamento {
+      display: none; text-align: center;
     }
-    td img {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
-      object-fit: cover;
-      margin-right: 8px;
-    }
-    .produto-info {
-      display: flex;
-      align-items: center;
-    }
-    .total {
-      font-size: 1.3em;
-      font-weight: bold;
-      text-align: right;
-      margin-top: 15px;
-      color: #222;
-    }
-    #pix {
-      display: block;
-      margin: 20px auto;
-      width: 220px;
-      border-radius: 12px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
-    .botao-limpar {
-      background: #ff5555;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: block;
-      margin: 15px auto;
-      font-size: 1em;
-    }
-    .botao-limpar:hover {
-      background: #ff2222;
+    #qr-pix {
+      width: 220px; margin-top: 20px;
+      border-radius: 12px; box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
   </style>
 </head>
@@ -89,20 +50,31 @@
   <h1>🛒 Pit Stop JadEx</h1>
   <p style="text-align:center;">Aponte a câmera para o QR Code do produto para adicionar ao carrinho.</p>
 
-  <div id="reader"></div>
+  <div id="principal">
+    <div id="reader"></div>
 
-  <table>
-    <thead>
-      <tr><th>Produto</th><th>Preço</th></tr>
-    </thead>
-    <tbody id="cart"></tbody>
-  </table>
+    <table>
+      <thead>
+        <tr><th>Produto</th><th>Preço</th></tr>
+      </thead>
+      <tbody id="cart"></tbody>
+    </table>
 
-  <div class="total">Total: R$ <span id="total">0.00</span></div>
+    <div class="total">Total: R$ <span id="total">0.00</span></div>
 
-  <button class="botao-limpar" onclick="limparCarrinho()">🧹 Limpar carrinho</button>
+    <button onclick="irParaPagamento()">💰 Pagar com Pix</button>
+    <button class="botao-limpar" onclick="limparCarrinho()">🧹 Limpar carrinho</button>
+  </div>
 
-  <img id="pix" src="pix-qrcode.png" alt="QR Code Pix">
+  <div id="pagamento">
+    <h2>Pagamento via Pix</h2>
+    <p>Escaneie o QR Code abaixo ou copie o código Pix.</p>
+    <img id="qr-pix" alt="QR Code Pix">
+    <p><strong>Valor:</strong> R$ <span id="valor-pix"></span></p>
+    <textarea id="codigo-pix" rows="3" style="width:90%;"></textarea>
+    <br>
+    <button onclick="voltar()">⬅️ Voltar</button>
+  </div>
 
   <script>
     // 🧃 Produtos cadastrados
@@ -113,6 +85,8 @@
     };
 
     let total = 0;
+    const chavePix = "sua_chave_pix_aqui@exemplo.com"; // 🟡 COLOQUE SUA CHAVE PIX AQUI
+    const nomeLoja = "Pit Stop JadEx";
 
     function adicionarProduto(codigo) {
       const produto = produtos[codigo];
@@ -142,14 +116,43 @@
       document.getElementById("total").textContent = "0.00";
     }
 
+    function gerarPayloadPix(valor) {
+      // Cria o código Pix (payload simplificado)
+      const formatted = valor.toFixed(2);
+      return `00020126360014BR.GOV.BCB.PIX0114${chavePix}5204000053039865404${formatted.replace('.', '')}5802BR5915${nomeLoja}6009SAO PAULO62100506ABC1236304`;
+    }
+
+    function irParaPagamento() {
+      if (total <= 0) {
+        alert("Adicione algum produto primeiro!");
+        return;
+      }
+
+      document.getElementById("principal").style.display = "none";
+      document.getElementById("pagamento").style.display = "block";
+
+      const valor = total;
+      const payload = gerarPayloadPix(valor);
+
+      document.getElementById("valor-pix").textContent = valor.toFixed(2);
+      document.getElementById("codigo-pix").value = payload;
+
+      // Gera o QR Code via API do Google
+      const qrUrl = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodeURIComponent(payload)}`;
+      document.getElementById("qr-pix").src = qrUrl;
+    }
+
+    function voltar() {
+      document.getElementById("principal").style.display = "block";
+      document.getElementById("pagamento").style.display = "none";
+    }
+
     // 📷 Inicializa o leitor de QR Code
     const html5QrCode = new Html5Qrcode("reader");
     html5QrCode.start(
       { facingMode: "environment" },
       { fps: 10, qrbox: 200 },
-      (decodedText) => {
-        adicionarProduto(decodedText.trim());
-      }
+      (decodedText) => adicionarProduto(decodedText.trim())
     ).catch(err => {
       console.error("Erro ao iniciar a câmera:", err);
       alert("Não foi possível acessar a câmera. Verifique as permissões.");
