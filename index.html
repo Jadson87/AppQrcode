@@ -7,79 +7,81 @@
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
+      background: #f6f8fa;
+      margin: 0;
       padding: 20px;
-      background: linear-gradient(180deg, #f7f9fc 0%, #e4e9f2 100%);
+    }
+    h1 {
+      text-align: center;
       color: #333;
     }
-    h1 { text-align: center; color: #0078d7; margin-bottom: 10px; }
+    .btn-scan {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 20px;
+      font-size: 16px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .btn-scan:hover { background: #0056b3; }
     #reader {
-      width: 280px; margin: 20px auto;
-      border-radius: 10px; overflow: hidden;
-      box-shadow: 0 0 8px rgba(0,0,0,0.15);
+      width: 300px;
+      margin: 20px auto;
+      display: none;
     }
     table {
-      width: 100%; margin-top: 10px;
-      border-collapse: collapse; background: white;
-      border-radius: 10px; overflow: hidden;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
     }
-    th { background: #0078d7; color: white; text-align: left; padding: 10px; }
-    td { border-bottom: 1px solid #eee; padding: 10px; vertical-align: middle; }
-    td img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; margin-right: 8px; }
-    .produto-info { display: flex; align-items: center; }
-    .total { font-size: 1.3em; font-weight: bold; text-align: right; margin-top: 15px; color: #222; }
-    button {
-      background: #0078d7; color: white; border: none;
-      padding: 10px 16px; border-radius: 8px; cursor: pointer;
-      display: block; margin: 15px auto; font-size: 1em;
+    th, td {
+      border-bottom: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
     }
-    button:hover { background: #005fa3; }
-    .botao-limpar { background: #ff5555; }
-    .botao-limpar:hover { background: #ff2222; }
-    #pagamento {
-      display: none; text-align: center;
+    .total {
+      font-size: 1.3em;
+      font-weight: bold;
+      text-align: right;
+      margin-top: 10px;
     }
-    #qr-pix {
-      width: 220px; margin-top: 20px;
-      border-radius: 12px; box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    #pix {
+      display: block;
+      margin: 20px auto;
+      width: 200px;
+    }
+    .produto-imagem {
+      width: 50px;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
   <h1>🛒 Pit Stop JadEx</h1>
-  <p style="text-align:center;">Aponte a câmera para o QR Code do produto para adicionar ao carrinho.</p>
 
-  <div id="principal">
-    <div id="reader"></div>
+  <button class="btn-scan" id="btnStartScan">📷 Escanear Produto</button>
 
-    <table>
-      <thead>
-        <tr><th>Produto</th><th>Preço</th></tr>
-      </thead>
-      <tbody id="cart"></tbody>
-    </table>
+  <div id="reader"></div>
 
-    <div class="total">Total: R$ <span id="total">0.00</span></div>
+  <table>
+    <thead>
+      <tr><th>Produto</th><th>Preço</th></tr>
+    </thead>
+    <tbody id="cart"></tbody>
+  </table>
 
-    <button onclick="irParaPagamento()">💰 Pagar com Pix</button>
-    <button class="botao-limpar" onclick="limparCarrinho()">🧹 Limpar carrinho</button>
-  </div>
+  <div class="total">Total: R$ <span id="total">0.00</span></div>
 
-  <div id="pagamento">
-    <h2>Pagamento via Pix</h2>
-    <p>Escaneie o QR Code abaixo ou copie o código Pix.</p>
-    <img id="qr-pix" alt="QR Code Pix">
-    <p><strong>Valor:</strong> R$ <span id="valor-pix"></span></p>
-    <textarea id="codigo-pix" rows="3" style="width:90%;"></textarea>
-    <br>
-    <button onclick="voltar()">⬅️ Voltar</button>
-  </div>
+  <h3 style="text-align:center;">Pague com Pix:</h3>
+  <img id="pix" src="pix-qrcode.png" alt="QR Code Pix">
 
   <script>
-    // 🧃 Produtos cadastrados
     const produtos = {
-       "REF001": { nome: "Refrigerante Pepsi Lata 350 ml", preco: 3.70, imagem: "Ref Pepsi Lt 350ml.jpg" },
+      "REF001": { nome: "Refrigerante Pepsi Lata 350 ml", preco: 3.70, imagem: "Ref Pepsi Lt 350ml.jpg" },
       "REF002": { nome: "Refrigerante Pepsi Black Lata 350 ml", preco: 4.00, imagem: "Ref Pepsi Black Lt 350ml.jpg" },
       "REF003": { nome: "Refrigerante Pepsi Twist Lata 350 ml", preco: 4.00, imagem: "Ref Pepsi Twist Lt 350ml.jpg" },
       "REF004": { nome: "Refrigerante Guaraná Antártica Lata 350 ml", preco: 4.00, imagem: "Ref G Antartica Lt 350ml.jpg" },
@@ -92,77 +94,43 @@
     };
 
     let total = 0;
-    const chavePix = "85987398273"; // 🟡 COLOQUE SUA CHAVE PIX AQUI
-    const nomeLoja = "Pit Stop JadEx";
+    let html5QrCode = null;
 
     function adicionarProduto(codigo) {
       const produto = produtos[codigo];
       if (!produto) {
-        alert("❌ Produto não encontrado!");
+        alert("Produto não encontrado!");
         return;
       }
 
       const linha = document.createElement("tr");
       linha.innerHTML = `
-        <td>
-          <div class="produto-info">
-            <img src="${produto.imagem}" alt="${produto.nome}">
-            <span>${produto.nome}</span>
-          </div>
-        </td>
+        <td><img src="${produto.imagem}" class="produto-imagem"> ${produto.nome}</td>
         <td>R$ ${produto.preco.toFixed(2)}</td>
       `;
       document.getElementById("cart").appendChild(linha);
+
       total += produto.preco;
       document.getElementById("total").textContent = total.toFixed(2);
     }
 
-    function limparCarrinho() {
-      document.getElementById("cart").innerHTML = "";
-      total = 0;
-      document.getElementById("total").textContent = "0.00";
-    }
+    document.getElementById("btnStartScan").addEventListener("click", async () => {
+      const readerDiv = document.getElementById("reader");
+      readerDiv.style.display = "block";
+      document.getElementById("btnStartScan").style.display = "none";
 
-    function gerarPayloadPix(valor) {
-      // Cria o código Pix (payload simplificado)
-      const formatted = valor.toFixed(2);
-      return `00020126360014BR.GOV.BCB.PIX0114${chavePix}5204000053039865404${formatted.replace('.', '')}5802BR5915${nomeLoja}6009SAO PAULO62100506ABC1236304`;
-    }
-
-    function irParaPagamento() {
-      if (total <= 0) {
-        alert("Adicione algum produto primeiro!");
-        return;
+      html5QrCode = new Html5Qrcode("reader");
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: 200 },
+          (decodedText) => {
+            adicionarProduto(decodedText.trim());
+          }
+        );
+      } catch (err) {
+        alert("Erro ao acessar a câmera: " + err);
       }
-
-      document.getElementById("principal").style.display = "none";
-      document.getElementById("pagamento").style.display = "block";
-
-      const valor = total;
-      const payload = gerarPayloadPix(valor);
-
-      document.getElementById("valor-pix").textContent = valor.toFixed(2);
-      document.getElementById("codigo-pix").value = payload;
-
-      // Gera o QR Code via API do Google
-      const qrUrl = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodeURIComponent(payload)}`;
-      document.getElementById("qr-pix").src = qrUrl;
-    }
-
-    function voltar() {
-      document.getElementById("principal").style.display = "block";
-      document.getElementById("pagamento").style.display = "none";
-    }
-
-    // 📷 Inicializa o leitor de QR Code
-    const html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 200 },
-      (decodedText) => adicionarProduto(decodedText.trim())
-    ).catch(err => {
-      console.error("Erro ao iniciar a câmera:", err);
-      alert("Não foi possível acessar a câmera. Verifique as permissões.");
     });
   </script>
 </body>
