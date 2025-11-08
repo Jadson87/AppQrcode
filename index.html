@@ -33,25 +33,36 @@
       margin: 20px auto;
       display: none;
     }
-    .manual-add {
+    .produto-info {
       text-align: center;
-      margin: 15px 0;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: 10px auto;
+      display: none;
     }
-    select, input[type="number"] {
+    .produto-info img {
+      width: 80px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .produto-info input {
+      width: 80px;
       padding: 8px;
       font-size: 16px;
-      margin-right: 8px;
+      margin: 10px;
     }
-    button.add-manual {
-      padding: 8px 15px;
-      font-size: 16px;
+    .produto-info button {
       background: #28a745;
       color: white;
       border: none;
       border-radius: 6px;
+      padding: 8px 15px;
       cursor: pointer;
     }
-    button.add-manual:hover { background: #1e7e34; }
+    .produto-info button:hover { background: #1e7e34; }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -86,12 +97,16 @@
 
   <div id="reader"></div>
 
-  <div class="manual-add">
-    <select id="produtoSelect">
-      <option value="">Selecione o produto</option>
-    </select>
-    <input type="number" id="quantidade" placeholder="Qtd" min="1" value="1">
-    <button class="add-manual" id="btnAddManual">Adicionar</button>
+  <!-- Mostra informações do produto escaneado -->
+  <div id="produtoInfo" class="produto-info">
+    <img id="produtoImg" src="" alt="">
+    <h3 id="produtoNome"></h3>
+    <p id="produtoPreco"></p>
+    <div>
+      <label>Quantidade:</label>
+      <input type="number" id="qtdInput" min="1" value="1">
+      <button id="btnAdicionarQtd">Adicionar</button>
+    </div>
   </div>
 
   <table>
@@ -117,18 +132,10 @@
       "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
-    // Preenche o <select> com os produtos
-    const select = document.getElementById("produtoSelect");
-    for (const codigo in produtos) {
-      const opt = document.createElement("option");
-      opt.value = codigo;
-      opt.textContent = produtos[codigo].nome;
-      select.appendChild(opt);
-    }
-
     let total = 0;
     let html5QrCode = null;
-    let ultimosCodigos = {};
+    let produtoAtual = null;
+    let bloqueioLeitura = false;
 
     function adicionarProduto(codigo, qtd = 1) {
       const produto = produtos[codigo];
@@ -149,12 +156,21 @@
       document.getElementById("total").textContent = total.toFixed(2);
     }
 
-    function processarCodigo(codigo) {
-      const agora = Date.now();
-      if (ultimosCodigos[codigo] && agora - ultimosCodigos[codigo] < 5000) return;
-      ultimosCodigos[codigo] = agora;
-      adicionarProduto(codigo, 1);
+    function mostrarProduto(produto) {
+      document.getElementById("produtoImg").src = produto.imagem;
+      document.getElementById("produtoNome").textContent = produto.nome;
+      document.getElementById("produtoPreco").textContent = "Preço: R$ " + produto.preco.toFixed(2);
+      document.getElementById("produtoInfo").style.display = "block";
     }
+
+    document.getElementById("btnAdicionarQtd").addEventListener("click", () => {
+      const qtd = parseInt(document.getElementById("qtdInput").value);
+      if (produtoAtual && qtd > 0) {
+        adicionarProduto(produtoAtual, qtd);
+        document.getElementById("produtoInfo").style.display = "none";
+        bloqueioLeitura = false;
+      }
+    });
 
     document.getElementById("btnStartScan").addEventListener("click", async () => {
       const readerDiv = document.getElementById("reader");
@@ -165,22 +181,4 @@
       try {
         await html5QrCode.start(
           { facingMode: "environment" },
-          { fps: 10, qrbox: 200 },
-          (decodedText) => processarCodigo(decodedText.trim())
-        );
-      } catch (err) {
-        alert("Erro ao acessar a câmera: " + err);
-      }
-    });
-
-    // Adicionar manualmente (usando seletor + quantidade)
-    document.getElementById("btnAddManual").addEventListener("click", () => {
-      const codigo = document.getElementById("produtoSelect").value;
-      const qtd = parseInt(document.getElementById("quantidade").value);
-      if (!codigo) return alert("Selecione um produto!");
-      if (qtd < 1) return alert("Quantidade inválida!");
-      adicionarProduto(codigo, qtd);
-    });
-  </script>
-</body>
-</html>
+          { fps: 10, q
