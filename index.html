@@ -88,8 +88,8 @@
       "REF005": { nome: "Refrigerante Guaraná Antártica Zero Lata 350 ml", preco: 4.00, imagem: "refrigerante-lata.jpg" },
       "REF006": { nome: "Refrigerante Sukita Laranja Lata 350 ml", preco: 3.70, imagem: "Ref Sukita laranja Lt 350ml.jpg" },
       "REF007": { nome: "Refrigerante Soda Limonada Lata 350 ml", preco: 3.70, imagem: "refrigerante-lata.jpg" },
-      "AGU001": { nome: "Água Mineral indaiá c gás 330 ml", preco: 3.50, imagem: "aguacomgas.jpg" }
-      "AGU002": { nome: "Água Mineral indaiá 330 ml", preco: 2.50, imagem: "refrigerante-lata.jpg" },  
+      "AGU001": { nome: "Água Mineral indaiá c gás 330 ml", preco: 3.50, imagem: "aguacomgas.jpg" },
+      "AGU002": { nome: "Água Mineral indaiá 330 ml", preco: 2.50, imagem: "refrigerante-lata.jpg" },
       "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
@@ -129,7 +129,7 @@
           }
         );
       } catch (err) {
-        alert("Erro ao acessar a câmera: " + err);
+        alert("⚠️ Erro ao acessar a câmera.\nVerifique se:\n• Está acessando via HTTPS (GitHub Pages)\n• Permitiu o uso da câmera no navegador.\n\nDetalhes: " + err);
       }
     });
   </script>
