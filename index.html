@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compra Rápida QR</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f6f8fa;
+    }
+    h1 { text-align: center; }
+    #reader { width: 300px; margin: 20px auto; }
+    table {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border-bottom: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    .total {
+      font-size: 1.3em;
+      font-weight: bold;
+      text-align: right;
+      margin-top: 10px;
+    }
+    #pix {
+      display: block;
+      margin: 20px auto;
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Compra Rápida QR</h1>
+
+  <div id="reader"></div>
+
+  <table>
+    <thead>
+      <tr><th>Produto</th><th>Preço</th></tr>
+    </thead>
+    <tbody id="cart"></tbody>
+  </table>
+
+  <div class="total">Total: R$ <span id="total">0.00</span></div>
+
+  <img id="pix" src="pix-qrcode.png" alt="QR Code Pix">
+
+  <script>
+    const produtos = {
+      "REF001": { nome: "Refrigerante Lata", preco: 6.00 },
+      "SAL001": { nome: "Salgadinho", preco: 5.00 },
+      "REF002": { nome: "Refrigerante 2L", preco: 10.00 }
+    };
+
+    let total = 0;
+
+    function adicionarProduto(codigo) {
+      const produto = produtos[codigo];
+      if (!produto) {
+        alert("Produto não encontrado!");
+        return;
+      }
+      const linha = document.createElement("tr");
+      linha.innerHTML = `<td>${produto.nome}</td><td>R$ ${produto.preco.toFixed(2)}</td>`;
+      document.getElementById("cart").appendChild(linha);
+      total += produto.preco;
+      document.getElementById("total").textContent = total.toFixed(2);
+    }
+
+    // Inicializa o leitor de QR Code
+    const html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 200 },
+      (decodedText) => {
+        adicionarProduto(decodedText.trim());
+      }
+    );
+  </script>
+</body>
+</html>
