@@ -53,6 +53,7 @@
       padding: 8px;
       font-size: 16px;
       margin: 10px;
+      text-align: center;
     }
     .produto-info button {
       background: #28a745;
@@ -97,7 +98,6 @@
 
   <div id="reader"></div>
 
-  <!-- Mostra informações do produto escaneado -->
   <div id="produtoInfo" class="produto-info">
     <img id="produtoImg" src="" alt="">
     <h3 id="produtoNome"></h3>
@@ -119,66 +119,14 @@
   <div class="total">Total: R$ <span id="total">0.00</span></div>
 
   <h3 style="text-align:center;">Pague com Pix:</h3>
-  <img id="pix" src="pix-qrcode.png" alt="QR Code Pix">
+  <img id="pix" src="imagens/pix-qrcode.png" alt="QR Code Pix">
 
   <script>
     const produtos = {
-      "REF001": { nome: "Refrigerante Pepsi Lata 350 ml", preco: 3.70, imagem: "Ref Pepsi Lt 350ml.JPG" },
-      "REF002": { nome: "Refrigerante Pepsi Black Lata 350 ml", preco: 4.00, imagem: "Ref Pepsi Black Lt 350ml.JPG" },
-      "REF003": { nome: "Refrigerante Pepsi Twist Lata 350 ml", preco: 4.00, imagem: "Ref Pepsi Twist Lt 350ml.JPG" },
-      "REF004": { nome: "Guaraná Antártica Lata 350 ml", preco: 4.00, imagem: "Ref G Antartica Lt 350ml.JPG" },
-      "REF005": { nome: "Guaraná Antártica Zero Lata 350 ml", preco: 4.00, imagem: "refrigerante-lata.JPG" },
-      "REF006": { nome: "Sukita Laranja Lata 350 ml", preco: 3.70, imagem: "Ref Sukita laranja Lt 350ml.jPG" },
-      "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jPG" }
-    };
-
-    let total = 0;
-    let html5QrCode = null;
-    let produtoAtual = null;
-    let bloqueioLeitura = false;
-
-    function adicionarProduto(codigo, qtd = 1) {
-      const produto = produtos[codigo];
-      if (!produto) {
-        alert("Produto não encontrado!");
-        return;
-      }
-
-      const linha = document.createElement("tr");
-      linha.innerHTML = `
-        <td><img src="${produto.imagem}" class="produto-imagem"> ${produto.nome}</td>
-        <td>${qtd}</td>
-        <td>R$ ${(produto.preco * qtd).toFixed(2)}</td>
-      `;
-      document.getElementById("cart").appendChild(linha);
-
-      total += produto.preco * qtd;
-      document.getElementById("total").textContent = total.toFixed(2);
-    }
-
-    function mostrarProduto(produto) {
-      document.getElementById("produtoImg").src = produto.imagem;
-      document.getElementById("produtoNome").textContent = produto.nome;
-      document.getElementById("produtoPreco").textContent = "Preço: R$ " + produto.preco.toFixed(2);
-      document.getElementById("produtoInfo").style.display = "block";
-    }
-
-    document.getElementById("btnAdicionarQtd").addEventListener("click", () => {
-      const qtd = parseInt(document.getElementById("qtdInput").value);
-      if (produtoAtual && qtd > 0) {
-        adicionarProduto(produtoAtual, qtd);
-        document.getElementById("produtoInfo").style.display = "none";
-        bloqueioLeitura = false;
-      }
-    });
-
-    document.getElementById("btnStartScan").addEventListener("click", async () => {
-      const readerDiv = document.getElementById("reader");
-      readerDiv.style.display = "block";
-      document.getElementById("btnStartScan").style.display = "none";
-
-      html5QrCode = new Html5Qrcode("reader");
-      try {
-        await html5QrCode.start(
-          { facingMode: "environment" },
-          { fps: 10, q
+      "REF001": { nome: "Refrigerante Pepsi Lata 350 ml", preco: 3.70, imagem: "imagens/ref-pepsi-350ml.jpg" },
+      "REF002": { nome: "Refrigerante Pepsi Black Lata 350 ml", preco: 4.00, imagem: "imagens/ref-pepsi-black.jpg" },
+      "REF003": { nome: "Refrigerante Pepsi Twist Lata 350 ml", preco: 4.00, imagem: "imagens/ref-pepsi-twist.jpg" },
+      "REF004": { nome: "Guaraná Antártica Lata 350 ml", preco: 4.00, imagem: "imagens/ref-guarana.jpg" },
+      "REF005": { nome: "Guaraná Antártica Zero Lata 350 ml", preco: 4.00, imagem: "imagens/ref-guarana-zero.jpg" },
+      "REF006": { nome: "Sukita Laranja Lata 350 ml", preco: 3.70, imagem: "imagens/ref-sukita.jpg" },
+      "SAL001
