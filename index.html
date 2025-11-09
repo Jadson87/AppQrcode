@@ -167,7 +167,8 @@
   <div id="pixArea">
     <h3>Pague com Pix:</h3>
     <canvas id="pixQr"></canvas>
-    <p id="pixCode"></p>
+    <p><b>Copia e Cola Pix:</b></p>
+    <textarea id="pixCode" readonly style="width:90%;height:100px;font-size:14px;"></textarea>
     <button class="btn-novo" id="btnNovoPedido">🛒 Novo Pedido</button>
   </div>
 
@@ -181,7 +182,7 @@
       "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
-    const chavePix = "85987398273"; // sua chave Pix
+    const chavePix = "seuemail@seudominio.com"; // 🔑 coloque aqui sua chave PIX real
     const nomeLoja = "Pit Stop JadEx";
 
     let total = 0;
@@ -266,7 +267,45 @@
 
     document.getElementById("closeCamera").addEventListener("click", pararCamera);
 
-    // Finalizar compra → gerar QR Pix
+    // Função de CRC16 (obrigatória para Pix válido)
+    function crc16(str) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : (crc << 1);
+        }
+        crc &= 0xFFFF;
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    function gerarPixPayload(chave, valor, nome) {
+      const formattedValue = valor.toFixed(2);
+      const gui = "BR.GOV.BCB.PIX";
+      const countryCode = "BR";
+
+      function emv(id, value) {
+        const len = String(value.length).padStart(2, "0");
+        return id + len + value;
+      }
+
+      let payload =
+        "000201" +
+        emv("26", emv("00", gui) + emv("01", chave)) +
+        emv("52", "0000") +
+        emv("53", "986") +
+        emv("54", formattedValue) +
+        emv("58", countryCode) +
+        emv("59", nome.substring(0, 25)) +
+        emv("60", "BRASIL") +
+        emv("62", emv("05", "COMPRA")) +
+        "6304";
+
+      const checksum = crc16(payload);
+      return payload + checksum;
+    }
+
     document.getElementById("btnFinalizar").addEventListener("click", async () => {
       if (total <= 0) {
         alert("Carrinho vazio!");
@@ -281,12 +320,11 @@
       document.querySelector(".total").style.display = "none";
       document.getElementById("btnFinalizar").style.display = "none";
 
-      document.getElementById("pixCode").textContent = payload;
+      document.getElementById("pixCode").value = payload;
       const canvas = document.getElementById("pixQr");
       QRCode.toCanvas(canvas, payload, { width: 250 });
     });
 
-    // Novo pedido
     document.getElementById("btnNovoPedido").addEventListener("click", () => {
       total = 0;
       document.getElementById("cart").innerHTML = "";
@@ -296,34 +334,6 @@
       document.getElementById("btnFinalizar").style.display = "block";
       document.getElementById("pixArea").style.display = "none";
     });
-
-    // Função Pix corrigida
-    function gerarPixPayload(chave, valor, nome) {
-      const formattedValue = valor.toFixed(2);
-      const gui = "BR.GOV.BCB.PIX";
-      const merchantCategoryCode = "0000";
-      const transactionCurrency = "986";
-      const countryCode = "BR";
-
-      function emv(id, value) {
-        const len = String(value.length).padStart(2, "0");
-        return id + len + value;
-      }
-
-      const payload =
-        "000201" +
-        emv("26", emv("00", gui) + emv("01", chave)) +
-        emv("52", merchantCategoryCode) +
-        emv("53", transactionCurrency) +
-        emv("54", formattedValue) +
-        emv("58", countryCode) +
-        emv("59", nome.substring(0, 25)) +
-        emv("60", "BRASIL") +
-        emv("62", emv("05", "LOJA")) +
-        "6304";
-
-      return payload;
-    }
   </script>
 </body>
 </html>
