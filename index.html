@@ -30,7 +30,7 @@
       color: #333;
       font-size: 24px;
     }
-    .btn-scan, .btn-finalizar {
+    .btn-scan, .btn-finalizar, .btn-novo {
       display: block;
       margin: 20px auto;
       padding: 12px 20px;
@@ -41,7 +41,7 @@
       border-radius: 10px;
       cursor: pointer;
     }
-    .btn-scan:hover, .btn-finalizar:hover { background: #0056b3; }
+    .btn-scan:hover, .btn-finalizar:hover, .btn-novo:hover { background: #0056b3; }
     #reader-container {
       position: relative;
       display: none;
@@ -132,7 +132,7 @@
 <body>
   <header>
     <img src="Logo Ge.png" alt="Logo Pit Stop JadEx">
-    <h1> Pit Stop JadEx</h1>
+    <h1>Pit Stop JadEx</h1>
   </header>
 
   <button class="btn-scan" id="btnStartScan">📷 Escanear Produto</button>
@@ -168,6 +168,7 @@
     <h3>Pague com Pix:</h3>
     <canvas id="pixQr"></canvas>
     <p id="pixCode"></p>
+    <button class="btn-novo" id="btnNovoPedido">🛒 Novo Pedido</button>
   </div>
 
   <script>
@@ -177,11 +178,11 @@
       "REF003": { nome: "Refrigerante Pepsi Twist Lata 350 ml", preco: 4.00, imagem: "Ref Pepsi Twist Lt 350ml.JPG" },
       "REF004": { nome: "Refrigerante Guaraná Antártica Lata 350 ml", preco: 4.00, imagem: "Ref G Antartica Lt 350ml.JPG" },
       "REF005": { nome: "Refrigerante Sukita Laranja Lata 350 ml", preco: 4.00, imagem: "Ref Sukita laranja Lt 350ml.JPG" },
-      "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "imagens/salgadinho.jpg" }
+      "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
     const chavePix = "85987398273"; // sua chave Pix
-    const nomeLoja = "Pit Stop JadEx Ag Aquiraz";
+    const nomeLoja = "Pit Stop JadEx";
 
     let total = 0;
     let html5QrCode = null;
@@ -272,19 +273,56 @@
         return;
       }
 
-      await pararCamera(); // desliga a câmera ao ir pagar
+      await pararCamera();
 
       const payload = gerarPixPayload(chavePix, total, nomeLoja);
       document.getElementById("pixArea").style.display = "block";
-      document.getElementById("pixCode").textContent = payload;
+      document.querySelector("table").style.display = "none";
+      document.querySelector(".total").style.display = "none";
+      document.getElementById("btnFinalizar").style.display = "none";
 
+      document.getElementById("pixCode").textContent = payload;
       const canvas = document.getElementById("pixQr");
       QRCode.toCanvas(canvas, payload, { width: 250 });
     });
 
+    // Novo pedido
+    document.getElementById("btnNovoPedido").addEventListener("click", () => {
+      total = 0;
+      document.getElementById("cart").innerHTML = "";
+      document.getElementById("total").textContent = "0.00";
+      document.querySelector("table").style.display = "table";
+      document.querySelector(".total").style.display = "block";
+      document.getElementById("btnFinalizar").style.display = "block";
+      document.getElementById("pixArea").style.display = "none";
+    });
+
+    // Função Pix corrigida
     function gerarPixPayload(chave, valor, nome) {
       const formattedValue = valor.toFixed(2);
-      return `00020126580014BR.GOV.BCB.PIX0114${chave}520400005303986540${formattedValue}5802BR5913${nome}6009SAO PAULO62100506LOJA`;
+      const gui = "BR.GOV.BCB.PIX";
+      const merchantCategoryCode = "0000";
+      const transactionCurrency = "986";
+      const countryCode = "BR";
+
+      function emv(id, value) {
+        const len = String(value.length).padStart(2, "0");
+        return id + len + value;
+      }
+
+      const payload =
+        "000201" +
+        emv("26", emv("00", gui) + emv("01", chave)) +
+        emv("52", merchantCategoryCode) +
+        emv("53", transactionCurrency) +
+        emv("54", formattedValue) +
+        emv("58", countryCode) +
+        emv("59", nome.substring(0, 25)) +
+        emv("60", "BRASIL") +
+        emv("62", emv("05", "LOJA")) +
+        "6304";
+
+      return payload;
     }
   </script>
 </body>
