@@ -281,33 +281,11 @@
       return crc.toString(16).toUpperCase().padStart(4, '0');
     }
 
-    function 
-      const payload = "00020126360014br.gov.bcb.pix0114+55859873982735204000053039865802BR5905JADEX6009Sao Paulo610901227-20062230519daqr5062617326711496304A4BD";
- {
-      const formattedValue = valor.toFixed(2);
-      const gui = "BR.GOV.BCB.PIX";
-      const countryCode = "BR";
+function gerarPixPayload(chave, valor, nome) {
+  // Se você quiser usar um código Pix fixo (pré-gerado), basta retornar ele aqui:
+  return "00020126360014br.gov.bcb.pix0114+55859873982735204000053039865802BR5905JADEX6009Sao Paulo610901227-20062230519daqr5062617326711496304A4BD";
+}
 
-      function emv(id, value) {
-        const len = String(value.length).padStart(2, "0");
-        return id + len + value;
-      }
-
-      let payload =
-        "000201" +
-        emv("26", emv("00", gui) + emv("01", chave)) +
-        emv("52", "0000") +
-        emv("53", "986") +
-        emv("54", formattedValue) +
-        emv("58", countryCode) +
-        emv("59", nome.substring(0, 25)) +
-        emv("60", "BRASIL") +
-        emv("62", emv("05", "COMPRA")) +
-        "6304";
-
-      const checksum = crc16(payload);
-      return payload + checksum;
-    }
 
     document.getElementById("btnFinalizar").addEventListener("click", async () => {
       if (total <= 0) {
