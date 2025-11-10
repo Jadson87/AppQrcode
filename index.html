@@ -287,34 +287,36 @@ function gerarPixPayload(chave, valor, nome) {
 }
 
 
-    document.getElementById("btnFinalizar").addEventListener("click", async () => {
-      if (total <= 0) {
-        alert("Carrinho vazio!");
-        return;
-      }
+    document.getElementById("btnFinalizar").addEventListener("click", () => {
+  if (total <= 0) {
+    alert("Carrinho vazio!");
+    return;
+  }
 
-      await pararCamera();
+  // Fecha câmera se estiver aberta
+  pararCamera();
 
-      const payload = gerarPixPayload(chavePix, total, nomeLoja);
-      document.getElementById("pixArea").style.display = "block";
-      document.querySelector("table").style.display = "none";
-      document.querySelector(".total").style.display = "none";
-      document.getElementById("btnFinalizar").style.display = "none";
+  // Mostra área PIX e esconde carrinho
+  document.getElementById("pixArea").style.display = "block";
+  document.querySelector("table").style.display = "none";
+  document.querySelector(".total").style.display = "none";
+  document.getElementById("btnFinalizar").style.display = "none";
 
-      document.getElementById("pixCode").value = payload;
-      const canvas = document.getElementById("pixQr");
-      QRCode.toCanvas(canvas, payload, { width: 250 });
+  // Usa o código PIX fixo
+  const payload = gerarPixPayload(chavePix, total, nomeLoja);
+
+  // Preenche campo de copiar e cola
+  document.getElementById("pixCode").value = payload;
+
+  // Gera o QR Code com pequeno delay (garante que o canvas esteja visível)
+  setTimeout(() => {
+    const canvas = document.getElementById("pixQr");
+    QRCode.toCanvas(canvas, payload, { width: 250 }, (error) => {
+      if (error) console.error("Erro ao gerar QR Code:", error);
     });
+  }, 300);
+});
 
-    document.getElementById("btnNovoPedido").addEventListener("click", () => {
-      total = 0;
-      document.getElementById("cart").innerHTML = "";
-      document.getElementById("total").textContent = "0.00";
-      document.querySelector("table").style.display = "table";
-      document.querySelector(".total").style.display = "block";
-      document.getElementById("btnFinalizar").style.display = "block";
-      document.getElementById("pixArea").style.display = "none";
-    });
   </script>
 </body>
 </html>
