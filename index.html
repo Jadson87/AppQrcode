@@ -51,12 +51,7 @@
       letter-spacing: 0.5px;
     }
 
-    .btn-scan {
-      background: #333;
-      color: #fff;
-    }
-
-    .btn-finalizar {
+    .btn-scan, .btn-finalizar {
       background: #333;
       color: #fff;
     }
@@ -76,7 +71,6 @@
       color: #fff;
     }
 
-    /* Container da câmera */
     #reader-container {
       position: relative;
       display: none;
@@ -108,7 +102,6 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    /* Produto escaneado */
     .produto-info {
       text-align: center;
       background: #fff;
@@ -127,7 +120,7 @@
     }
 
     .produto-info img {
-      width: 90px;
+      width: 150px;
       border-radius: 10px;
       margin-bottom: 10px;
     }
@@ -140,6 +133,14 @@
       border-radius: 8px;
       border: 1px solid #ccc;
       margin: 10px;
+      -moz-appearance: textfield;
+    }
+
+    /* Garante que as setinhas apareçam no Chrome e Edge */
+    .produto-info input::-webkit-inner-spin-button, 
+    .produto-info input::-webkit-outer-spin-button {
+      -webkit-appearance: inner-spin-button;
+      opacity: 1;
     }
 
     .produto-info button {
@@ -153,7 +154,6 @@
       background: #f7941e;
     }
 
-    /* Tabela do carrinho */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -182,7 +182,7 @@
     }
 
     .produto-imagem {
-      width: 50px;
+      width: 60px;
       border-radius: 5px;
     }
 
@@ -194,7 +194,6 @@
       color: #333;
     }
 
-    /* Área do Pix */
     #pixArea {
       display: none;
       text-align: center;
@@ -241,7 +240,7 @@
     <p id="produtoPreco"></p>
     <div>
       <label>Quantidade:</label>
-      <input type="number" id="qtdInput" min="1" value="1">
+      <input type="number" id="qtdInput" min="1" max="10" value="1">
       <button id="btnAdicionarQtd">Adicionar</button>
     </div>
   </div>
@@ -295,10 +294,7 @@
 
     function adicionarProduto(codigo, qtd = 1) {
       const produto = produtos[codigo];
-      if (!produto) {
-        alert("Produto não encontrado!");
-        return;
-      }
+      if (!produto) return;
 
       const linha = document.createElement("tr");
       linha.innerHTML = `
@@ -307,7 +303,6 @@
         <td>R$ ${(produto.preco * qtd).toFixed(2)}</td>
       `;
       document.getElementById("cart").appendChild(linha);
-
       total += produto.preco * qtd;
       document.getElementById("total").textContent = total.toFixed(2);
     }
@@ -354,15 +349,28 @@
           }
         );
       } catch (err) {
-        console.error("Erro ao abrir câmera:", err);
-        alert("Não foi possível acessar a câmera. Verifique as permissões.");
+        alert("Não foi possível acessar a câmera.");
       }
     });
 
     document.getElementById("closeCamera").addEventListener("click", pararCamera);
 
-    function gerarPixPayload() {
-      return "00020126360014br.gov.bcb.pix0114+55859873982735204000053039865802BR5905JADEX6009Sao Paulo610901227-20062230519daqr5062617326711496304A4BD";
+    function crc16(str) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : (crc << 1);
+        }
+        crc &= 0xFFFF;
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    function gerarPixPayload(chave, valor, nome) {
+      valor = valor.toFixed(2);
+      const payload = `00020126580014br.gov.bcb.pix0114${chave}520400005303986540${valor.length}${valor}5802BR5913${nome}6009Sao Paulo62070503***6304`;
+      return payload + crc16(payload);
     }
 
     document.getElementById("btnFinalizar").addEventListener("click", () => {
@@ -378,7 +386,7 @@
       document.querySelector(".total").style.display = "none";
       document.getElementById("btnFinalizar").style.display = "none";
 
-      const payload = gerarPixPayload();
+      const payload = gerarPixPayload(chavePix, total, nomeLoja);
       document.getElementById("pixCode").value = payload;
 
       setTimeout(() => {
