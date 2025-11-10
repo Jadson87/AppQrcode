@@ -8,124 +8,217 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f6f8fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f4f4;
       margin: 0;
       padding: 20px;
+      color: #222;
     }
+
     header {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
+
     header img {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
+      width: 55px;
+      height: 55px;
+      border-radius: 10px;
     }
+
     h1 {
-      text-align: center;
-      color: #333;
-      font-size: 24px;
+      font-size: 26px;
+      color: #222;
+      font-weight: 600;
+      margin: 0;
     }
-    .btn-scan, .btn-finalizar, .btn-novo {
+
+    /* Botões gerais */
+    .btn-scan, .btn-finalizar, .btn-novo, .produto-info button {
       display: block;
       margin: 20px auto;
-      padding: 12px 20px;
+      padding: 14px 25px;
       font-size: 16px;
-      background: #007bff;
-      color: #fff;
+      font-weight: bold;
       border: none;
-      border-radius: 10px;
+      border-radius: 30px;
       cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .btn-scan:hover, .btn-finalizar:hover, .btn-novo:hover { background: #0056b3; }
+
+    .btn-scan {
+      background: #333;
+      color: #fff;
+    }
+
+    .btn-finalizar {
+      background: #333;
+      color: #fff;
+    }
+
+    .btn-novo {
+      background: #f7941e;
+      color: #fff;
+    }
+
+    .btn-scan:hover, .btn-finalizar:hover {
+      background: #f7941e;
+      color: #fff;
+    }
+
+    .btn-novo:hover {
+      background: #222;
+      color: #fff;
+    }
+
+    /* Container da câmera */
     #reader-container {
       position: relative;
       display: none;
-      width: 300px;
+      width: 320px;
       margin: 20px auto;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
+
     #reader {
       width: 100%;
-      border-radius: 8px;
-      overflow: hidden;
+      border-radius: 12px;
     }
+
     #closeCamera {
       position: absolute;
-      top: -10px;
-      right: -10px;
+      top: 8px;
+      right: 8px;
       background: #ff4d4d;
       color: white;
       border: none;
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       font-weight: bold;
+      font-size: 18px;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
+
+    /* Produto escaneado */
     .produto-info {
       text-align: center;
       background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       max-width: 400px;
       margin: 10px auto;
       display: none;
+      animation: fadeIn 0.3s ease;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
     .produto-info img {
-      width: 80px;
-      border-radius: 8px;
+      width: 90px;
+      border-radius: 10px;
       margin-bottom: 10px;
     }
+
     .produto-info input {
-      width: 80px;
+      width: 90px;
       padding: 8px;
       font-size: 16px;
-      margin: 10px;
       text-align: center;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin: 10px;
     }
+
     .produto-info button {
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 15px;
-      cursor: pointer;
+      background: #333;
+      color: #fff;
+      border-radius: 20px;
+      padding: 10px 20px;
     }
-    .produto-info button:hover { background: #1e7e34; }
+
+    .produto-info button:hover {
+      background: #f7941e;
+    }
+
+    /* Tabela do carrinho */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
     }
+
     th, td {
-      border-bottom: 1px solid #ccc;
-      padding: 8px;
+      border-bottom: 1px solid #eee;
+      padding: 12px;
       text-align: left;
     }
+
+    th {
+      background: #333;
+      color: #fff;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    td {
+      color: #333;
+      font-size: 15px;
+    }
+
+    .produto-imagem {
+      width: 50px;
+      border-radius: 5px;
+    }
+
     .total {
-      font-size: 1.3em;
+      font-size: 1.4em;
       font-weight: bold;
       text-align: right;
-      margin-top: 10px;
+      margin-top: 15px;
+      color: #333;
     }
+
+    /* Área do Pix */
     #pixArea {
       display: none;
       text-align: center;
       margin-top: 30px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+
     #pixQr {
       width: 250px;
       margin: 15px auto;
     }
-    .produto-imagem {
-      width: 50px;
-      border-radius: 5px;
+
+    textarea {
+      width: 90%;
+      height: 100px;
+      font-size: 14px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      resize: none;
+      color: #333;
     }
   </style>
 </head>
@@ -169,7 +262,7 @@
     <h3>Pague com Pix:</h3>
     <canvas id="pixQr"></canvas>
     <p><b>Copia e Cola Pix:</b></p>
-    <textarea id="pixCode" readonly style="width:90%;height:100px;font-size:14px;"></textarea>
+    <textarea id="pixCode" readonly></textarea>
     <button class="btn-novo" id="btnNovoPedido">🛒 Novo Pedido</button>
   </div>
 
@@ -183,7 +276,7 @@
       "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
-    const chavePix = "85987398273"; // 🔑 coloque aqui sua chave PIX real
+    const chavePix = "85987398273";
     const nomeLoja = "Pit Stop JadEx Ag Aquiraz";
 
     let total = 0;
@@ -268,55 +361,30 @@
 
     document.getElementById("closeCamera").addEventListener("click", pararCamera);
 
-    // Função de CRC16 (obrigatória para Pix válido)
-    function crc16(str) {
-      let crc = 0xFFFF;
-      for (let i = 0; i < str.length; i++) {
-        crc ^= str.charCodeAt(i) << 8;
-        for (let j = 0; j < 8; j++) {
-          crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : (crc << 1);
-        }
-        crc &= 0xFFFF;
-      }
-      return crc.toString(16).toUpperCase().padStart(4, '0');
+    function gerarPixPayload() {
+      return "00020126360014br.gov.bcb.pix0114+55859873982735204000053039865802BR5905JADEX6009Sao Paulo610901227-20062230519daqr5062617326711496304A4BD";
     }
 
-function gerarPixPayload(chave, valor, nome) {
-  // Se você quiser usar um código Pix fixo (pré-gerado), basta retornar ele aqui:
-  return "00020126360014br.gov.bcb.pix0114+55859873982735204000053039865802BR5905JADEX6009Sao Paulo610901227-20062230519daqr5062617326711496304A4BD";
-}
-
-
     document.getElementById("btnFinalizar").addEventListener("click", () => {
-  if (total <= 0) {
-    alert("Carrinho vazio!");
-    return;
-  }
+      if (total <= 0) {
+        alert("Carrinho vazio!");
+        return;
+      }
 
-  // Fecha câmera se estiver aberta
-  pararCamera();
+      pararCamera();
 
-  // Mostra área PIX e esconde carrinho
-  document.getElementById("pixArea").style.display = "block";
-  document.querySelector("table").style.display = "none";
-  document.querySelector(".total").style.display = "none";
-  document.getElementById("btnFinalizar").style.display = "none";
+      document.getElementById("pixArea").style.display = "block";
+      document.querySelector("table").style.display = "none";
+      document.querySelector(".total").style.display = "none";
+      document.getElementById("btnFinalizar").style.display = "none";
 
-  // Usa o código PIX fixo
-  const payload = gerarPixPayload(chavePix, total, nomeLoja);
+      const payload = gerarPixPayload();
+      document.getElementById("pixCode").value = payload;
 
-  // Preenche campo de copiar e cola
-  document.getElementById("pixCode").value = payload;
-
-  // Gera o QR Code com pequeno delay (garante que o canvas esteja visível)
-  setTimeout(() => {
-    const canvas = document.getElementById("pixQr");
-    QRCode.toCanvas(canvas, payload, { width: 250 }, (error) => {
-      if (error) console.error("Erro ao gerar QR Code:", error);
+      setTimeout(() => {
+        QRCode.toCanvas(document.getElementById("pixQr"), payload, { width: 250 });
+      }, 300);
     });
-  }, 300);
-});
-
   </script>
 </body>
 </html>
