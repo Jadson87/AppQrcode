@@ -36,7 +36,7 @@
       margin: 0;
     }
 
-    .btn-scan, .btn-finalizar, .btn-novo, .produto-info button, #btnCopiarPix {
+    .btn-scan, .btn-finalizar, .btn-novo, .btn-copiar, .produto-info button {
       display: block;
       margin: 20px auto;
       padding: 14px 25px;
@@ -50,7 +50,7 @@
       letter-spacing: 0.5px;
     }
 
-    .btn-scan, .btn-finalizar, #btnCopiarPix {
+    .btn-scan, .btn-finalizar, .btn-copiar {
       background: #333;
       color: #fff;
     }
@@ -60,7 +60,7 @@
       color: #fff;
     }
 
-    .btn-scan:hover, .btn-finalizar:hover, #btnCopiarPix:hover {
+    .btn-scan:hover, .btn-finalizar:hover, .btn-copiar:hover {
       background: #f7941e;
       color: #fff;
     }
@@ -138,45 +138,35 @@
 
     .quantidade-container {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .quantidade-controle {
-      display: flex;
-      align-items: center;
       justify-content: center;
-      background: #f4f4f4;
-      border-radius: 30px;
-      padding: 5px 10px;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
     }
 
-    .btn-qtd {
-      background: #f7941e;
-      color: white;
+    .quantidade-container button {
+      background: #333;
+      color: #fff;
       border: none;
       border-radius: 50%;
       width: 35px;
       height: 35px;
       font-size: 20px;
-      font-weight: bold;
       cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-qtd:hover {
-      background: #333;
-    }
-
-    .quantidade-controle input {
-      width: 60px;
-      font-size: 18px;
       font-weight: bold;
+    }
+
+    .quantidade-container button:hover {
+      background: #f7941e;
+    }
+
+    .quantidade-container input {
+      width: 70px;
       text-align: center;
-      border: none;
-      background: transparent;
-      color: #333;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 6px;
     }
 
     table {
@@ -206,6 +196,13 @@
       font-size: 15px;
     }
 
+    .remove-item {
+      color: #ff4d4d;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
     .produto-imagem {
       width: 60px;
       border-radius: 5px;
@@ -215,18 +212,6 @@
 
     .produto-imagem:hover {
       transform: scale(1.4);
-    }
-
-    .remove-btn {
-      background: #ff4d4d;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 25px;
-      height: 25px;
-      font-size: 14px;
-      cursor: pointer;
-      font-weight: bold;
     }
 
     .total {
@@ -252,21 +237,28 @@
       margin: 15px auto;
     }
 
-    #agradecimento {
-      font-size: 18px;
+    #mensagemFinal {
+      display: none;
+      text-align: center;
+      font-size: 20px;
       color: #333;
-      font-weight: 600;
       margin-top: 20px;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
+
+  <!-- sons -->
+  <audio id="bipScan" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_552bd33a9d.mp3?filename=beep-6-96243.mp3"></audio>
+  <audio id="bipAdd" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d4a9a3ffb6.mp3?filename=beep-22-86118.mp3"></audio>
+
   <header>
     <img src="Logo Ge.png" alt="Logo Pit Stop JadEx">
     <h1>Pit Stop JadEx</h1>
   </header>
 
-  <button class="btn-scan" id="btnStartScan">Escanear Produto</button>
+  <button class="btn-scan" id="btnStartScan">📷 Escanear Produto</button>
 
   <div id="reader-container">
     <div id="reader"></div>
@@ -278,14 +270,11 @@
     <h3 id="produtoNome"></h3>
     <p id="produtoPreco"></p>
     <div class="quantidade-container">
-      <label>Quantidade:</label>
-      <div class="quantidade-controle">
-        <button id="btnMenos" class="btn-qtd">−</button>
-        <input type="number" id="qtdInput" min="1" max="10" value="1" readonly>
-        <button id="btnMais" class="btn-qtd">+</button>
-      </div>
-      <button id="btnAdicionarQtd">Adicionar</button>
+      <button id="btnMenos">−</button>
+      <input type="number" id="qtdInput" min="1" max="10" value="1">
+      <button id="btnMais">+</button>
     </div>
+    <button id="btnAdicionarQtd">Adicionar</button>
   </div>
 
   <table>
@@ -297,23 +286,26 @@
 
   <div class="total">Total: R$ <span id="total">0.00</span></div>
 
-  <button class="btn-finalizar" id="btnFinalizar">Finalizar Compra</button>
+  <button class="btn-finalizar" id="btnFinalizar">💳 Finalizar Compra</button>
 
   <div id="pixArea">
     <img src="Pix Qr-Code.JPG" alt="Logo Pix" style="width:120px; margin-bottom:10px;">
-    <button id="btnCopiarPix">Copiar Código Pix</button>
-    <div id="agradecimento">🎉 Obrigado por comprar! Volte sempre! 🎉</div>
-    <button class="btn-novo" id="btnNovoPedido">Novo Pedido</button>
+    <h3>Pague com Pix:</h3>
+    <canvas id="pixQr"></canvas>
+    <button class="btn-copiar" id="btnCopiarPix">📋 Copiar código Pix</button>
+    <button class="btn-novo" id="btnNovoPedido">🛒 Novo Pedido</button>
   </div>
+
+  <div id="mensagemFinal">🎉 Obrigado por comprar! Volte sempre! 🎉</div>
 
   <script>
     const produtos = {
-      "REF001": { nome: "Ref Pepsi Lt 350 ml", preco: 3.70, imagem: "Ref Pepsi Lt 350ml.JPG" },
-      "REF002": { nome: "Ref Pepsi Black Lt 350 ml", preco: 4.00, imagem: "Ref Pepsi Black Lt 350ml.JPG" },
-      "REF003": { nome: "Ref Pepsi Twist Lt 350 ml", preco: 4.00, imagem: "Ref Pepsi Twist Lt 350ml.JPG" },
-      "REF004": { nome: "Ref G Antártica Lt 350 ml", preco: 4.00, imagem: "Ref G Antartica Lt 350ml.JPG" },
-      "REF005": { nome: "Ref Sukita Laranja Lt 350 ml", preco: 4.00, imagem: "Ref Sukita laranja Lt 350ml.JPG" },
-      "SAL001": { nome: "Salg", preco: 5.00, imagem: "salgadinho.jpg" }
+      "REF001": { nome: "Refrigerante Pepsi Lata 350 ml", preco: 3.70, imagem: "Ref Pepsi Lt 350ml.JPG" },
+      "REF002": { nome: "Refrigerante Pepsi Black Lata 350 ml", preco: 4.00, imagem: "Ref Pepsi Black Lt 350ml.JPG" },
+      "REF003": { nome: "Refrigerante Pepsi Twist Lata 350 ml", preco: 4.00, imagem: "Ref Pepsi Twist Lt 350ml.JPG" },
+      "REF004": { nome: "Refrigerante Guaraná Antártica Lata 350 ml", preco: 4.00, imagem: "Ref G Antartica Lt 350ml.JPG" },
+      "REF005": { nome: "Refrigerante Sukita Laranja Lata 350 ml", preco: 4.00, imagem: "Ref Sukita laranja Lt 350ml.JPG" },
+      "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
     const chavePix = "+5585987398273";
@@ -323,6 +315,15 @@
     let html5QrCode = null;
     let produtoAtual = null;
     let bloqueioLeitura = false;
+    let payload = "";
+
+    function playSound(id) {
+      const audio = document.getElementById(id);
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
+    }
 
     async function pararCamera() {
       if (html5QrCode) {
@@ -338,20 +339,23 @@
       if (!produto) return;
 
       const linha = document.createElement("tr");
+      const precoFinal = produto.preco * qtd;
+
       linha.innerHTML = `
         <td><img src="${produto.imagem}" class="produto-imagem"> ${produto.nome}</td>
         <td>${qtd}</td>
-        <td>R$ ${(produto.preco * qtd).toFixed(2)}</td>
-        <td><button class="remove-btn">×</button></td>
+        <td>R$ ${precoFinal.toFixed(2)}</td>
+        <td><span class="remove-item">❌</span></td>
       `;
-      linha.querySelector(".remove-btn").addEventListener("click", () => {
-        linha.remove();
-        total -= produto.preco * qtd;
+
+      linha.querySelector(".remove-item").onclick = () => {
+        total -= precoFinal;
         document.getElementById("total").textContent = total.toFixed(2);
-      });
+        linha.remove();
+      };
 
       document.getElementById("cart").appendChild(linha);
-      total += produto.preco * qtd;
+      total += precoFinal;
       document.getElementById("total").textContent = total.toFixed(2);
     }
 
@@ -365,22 +369,25 @@
       document.getElementById("produtoInfo").style.display = "block";
     }
 
-    document.getElementById("btnMais").addEventListener("click", () => {
-      const qtdInput = document.getElementById("qtdInput");
-      let valor = parseInt(qtdInput.value);
-      if (valor < 10) qtdInput.value = valor + 1;
-    });
+    document.getElementById("btnMais").onclick = () => {
+      const input = document.getElementById("qtdInput");
+      if (input.value < 10) input.value++;
+    };
 
-    document.getElementById("btnMenos").addEventListener("click", () => {
-      const qtdInput = document.getElementById("qtdInput");
-      let valor = parseInt(qtdInput.value);
-      if (valor > 1) qtdInput.value = valor - 1;
+    document.getElementById("btnMenos").onclick = () => {
+      const input = document.getElementById("qtdInput");
+      if (input.value > 1) input.value--;
+    };
+
+    document.getElementById("produtoImg").addEventListener("click", function() {
+      this.classList.toggle("zoomed");
     });
 
     document.getElementById("btnAdicionarQtd").addEventListener("click", () => {
       const qtd = parseInt(document.getElementById("qtdInput").value);
       if (produtoAtual && qtd > 0) {
         adicionarProduto(produtoAtual, qtd);
+        playSound("bipAdd");
         document.getElementById("produtoInfo").style.display = "none";
         bloqueioLeitura = false;
       }
@@ -401,6 +408,7 @@
             bloqueioLeitura = true;
             const codigo = decodedText.trim();
             if (produtos[codigo]) {
+              playSound("bipScan");
               mostrarProduto(codigo);
             } else {
               alert("Produto não encontrado!");
@@ -415,6 +423,7 @@
 
     document.getElementById("closeCamera").addEventListener("click", pararCamera);
 
+    // Função CRC16
     function crc16(payload) {
       let polinomio = 0x1021;
       let resultado = 0xFFFF;
@@ -430,19 +439,13 @@
     function gerarPixPayload(chave, valor, nome) {
       valor = valor.toFixed(2);
       const nomeFormatado = nome.substring(0, 25);
-      const payload =
-        "000201" +
-        "26580014br.gov.bcb.pix" +
-        `0114${chave}` +
-        "52040000" +
-        "5303986" +
-        `54${valor.length.toString().padStart(2, "0")}${valor}` +
-        "5802BR" +
-        `59${nomeFormatado.length.toString().padStart(2, "0")}${nomeFormatado}` +
-        "6009SAO PAULO" +
-        "62070503***" +
-        "6304";
-      return payload + crc16(payload);
+      const payloadSemCRC =
+        "000201" + "26580014br.gov.bcb.pix" +
+        "01" + (chave.length.toString().padStart(2,"0")) + chave +
+        "52040000" + "5303986" + `540${valor.length}${valor}` +
+        "5802BR" + `59${nomeFormatado.length}${nomeFormatado}` +
+        "6009SAO PAULO" + "62070503***" + "6304";
+      return payloadSemCRC + crc16(payloadSemCRC);
     }
 
     document.getElementById("btnFinalizar").addEventListener("click", () => {
@@ -452,20 +455,29 @@
       }
 
       pararCamera();
+
       document.getElementById("pixArea").style.display = "block";
       document.querySelector("table").style.display = "none";
       document.querySelector(".total").style.display = "none";
       document.getElementById("btnFinalizar").style.display = "none";
 
-      const payload = gerarPixPayload(chavePix, total, nomeLoja);
-      QRCode.toCanvas(document.getElementById("pixQr"), payload, { width: 250 });
+      payload = gerarPixPayload(chavePix, total, nomeLoja);
 
-      // Função copiar Pix
-      document.getElementById("btnCopiarPix").onclick = () => {
-        navigator.clipboard.writeText(payload);
-        alert("Código Pix copiado com sucesso!");
-      };
+      setTimeout(() => {
+        QRCode.toCanvas(document.getElementById("pixQr"), payload, { width: 250 });
+      }, 300);
     });
+
+    document.getElementById("btnCopiarPix").onclick = () => {
+      const tempInput = document.createElement("textarea");
+      tempInput.value = payload;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+      alert("✅ Código Pix copiado com sucesso!");
+      document.getElementById("mensagemFinal").style.display = "block";
+    };
 
     document.getElementById("btnNovoPedido").addEventListener("click", () => {
       location.reload();
