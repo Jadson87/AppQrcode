@@ -115,7 +115,7 @@
       "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
-    const chavePix = "85987398273";
+    const chavePix = "+5585987398273";
     const nomeLoja = "Pit Stop JadEx";
 
     let total = 0, html5QrCode = null, produtoAtual = null, bloqueioLeitura = false, payloadGerado = "";
@@ -180,18 +180,32 @@
       return (resultado&0xFFFF).toString(16).toUpperCase().padStart(4,"0");
     }
 
-    function gerarPixPayload(chave, valor, nome){
-      valor = valor.toFixed(2);
-      const nomeFmt = nome.substring(0,25);
-      const campoValor = "54" + valor.length.toString().padStart(2,"0") + valor;
-      const campoNome  = "59" + nomeFmt.length.toString().padStart(2,"0") + nomeFmt;
-      const payloadSemCRC =
-        "000201" + "26580014br.gov.bcb.pix" +
-        "01" + (chave.length.toString().padStart(2,"0")) + chave +
-        "52040000" + "5303986" + campoValor +
-        "5802BR" + campoNome + "6009SAO PAULO" + "62070503***" + "6304";
-      return payloadSemCRC + crc16(payloadSemCRC);
-    }
+    function gerarPixPayload(chave, valor, nome) {
+  valor = valor.toFixed(2);
+  const nomeFormatado = nome.substring(0, 25);
+
+  // Campos Pix formatados
+  const gui = "00" + "14" + "br.gov.bcb.pix";
+  const chavePix = "01" + chave.length.toString().padStart(2, "0") + chave;
+
+  const merchantAccountInfo = "26" + (gui.length + chavePix.length).toString().padStart(2, "0") + gui + chavePix;
+  const campoValor = "54" + valor.length.toString().padStart(2, "0") + valor;
+  const campoNome = "59" + nomeFormatado.length.toString().padStart(2, "0") + nomeFormatado;
+
+  const payloadSemCRC =
+    "000201" + // ID do formato
+    merchantAccountInfo +
+    "52040000" + // Categoria
+    "5303986" + // Moeda BRL
+    campoValor +
+    "5802BR" + // País
+    campoNome +
+    "6009SAO PAULO" + // Cidade
+    "62070503***" + // Identificador
+    "6304"; // Início CRC
+
+  return payloadSemCRC + crc16(payloadSemCRC);
+}
 
     document.getElementById("btnFinalizar").addEventListener("click", ()=>{
       if(total<=0){ alert("Carrinho vazio!"); return; }
