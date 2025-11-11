@@ -36,7 +36,6 @@
       margin: 0;
     }
 
-    /* Botões gerais */
     .btn-scan, .btn-finalizar, .btn-novo, .produto-info button {
       display: block;
       margin: 20px auto;
@@ -123,6 +122,18 @@
       width: 150px;
       border-radius: 10px;
       margin-bottom: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .produto-info img:hover {
+      transform: scale(1.15);
+    }
+
+    .zoomed {
+      width: 90% !important;
+      max-width: 400px;
+      z-index: 9999;
     }
 
     .produto-info input {
@@ -136,7 +147,6 @@
       -moz-appearance: textfield;
     }
 
-    /* Garante que as setinhas apareçam no Chrome e Edge */
     .produto-info input::-webkit-inner-spin-button, 
     .produto-info input::-webkit-outer-spin-button {
       -webkit-appearance: inner-spin-button;
@@ -184,6 +194,12 @@
     .produto-imagem {
       width: 60px;
       border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .produto-imagem:hover {
+      transform: scale(1.4);
     }
 
     .total {
@@ -247,7 +263,7 @@
 
   <table>
     <thead>
-      <tr><th>Produto</th><th>Unidade</th><th>Preço</th></tr>
+      <tr><th>Produto</th><th>Qtd</th><th>Preço</th></tr>
     </thead>
     <tbody id="cart"></tbody>
   </table>
@@ -259,7 +275,7 @@
   <div id="pixArea">
     <img src="Pix Qr-Code.JPG" alt="Logo Pix" style="width:120px; margin-bottom:10px;">
     <h3>Pague com Pix:</h3>
-    <img src="Pix Qr-Code.JPG" alt="Pix Qr Code" style="width:120px; margin-bottom:10px;">
+    <canvas id="pixQr"></canvas>
     <p><b>Copia e Cola Pix:</b></p>
     <textarea id="pixCode" readonly></textarea>
     <button class="btn-novo" id="btnNovoPedido">🛒 Novo Pedido</button>
@@ -317,6 +333,10 @@
       document.getElementById("produtoInfo").style.display = "block";
     }
 
+    document.getElementById("produtoImg").addEventListener("click", function() {
+      this.classList.toggle("zoomed");
+    });
+
     document.getElementById("btnAdicionarQtd").addEventListener("click", () => {
       const qtd = parseInt(document.getElementById("qtdInput").value);
       if (produtoAtual && qtd > 0) {
@@ -355,21 +375,34 @@
 
     document.getElementById("closeCamera").addEventListener("click", pararCamera);
 
-    function crc16(str) {
-      let crc = 0xFFFF;
-      for (let i = 0; i < str.length; i++) {
-        crc ^= str.charCodeAt(i) << 8;
+    // Função CRC16 padrão Pix
+    function crc16(payload) {
+      let polinomio = 0x1021;
+      let resultado = 0xFFFF;
+      for (let i = 0; i < payload.length; i++) {
+        resultado ^= payload.charCodeAt(i) << 8;
         for (let j = 0; j < 8; j++) {
-          crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : (crc << 1);
+          resultado = (resultado & 0x8000) ? (resultado << 1) ^ polinomio : (resultado << 1);
         }
-        crc &= 0xFFFF;
       }
-      return crc.toString(16).toUpperCase().padStart(4, '0');
+      return (resultado & 0xFFFF).toString(16).toUpperCase().padStart(4, "0");
     }
 
     function gerarPixPayload(chave, valor, nome) {
       valor = valor.toFixed(2);
-      const payload = `00020126580014br.gov.bcb.pix0114${chave}520400005303986540${valor.length}${valor}5802BR5913${nome}6009Sao Paulo62070503***6304`;
+      const nomeFormatado = nome.substring(0, 25);
+      const payload = 
+        "000201" +
+        "26580014br.gov.bcb.pix" +
+        `0114${chave}` +
+        "52040000" +
+        "5303986" +
+        `540${valor.length}${valor}` +
+        "5802BR" +
+        `5913${nomeFormatado}` +
+        "6009SAO PAULO" +
+        "62070503***" +
+        "6304";
       return payload + crc16(payload);
     }
 
@@ -392,6 +425,10 @@
       setTimeout(() => {
         QRCode.toCanvas(document.getElementById("pixQr"), payload, { width: 250 });
       }, 300);
+    });
+
+    document.getElementById("btnNovoPedido").addEventListener("click", () => {
+      location.reload();
     });
   </script>
 </body>
