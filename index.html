@@ -23,11 +23,20 @@
       margin-bottom: 20px;
     }
 
-    header img { width: 55px; height: 55px; border-radius: 10px; }
+    header img {
+      width: 55px;
+      height: 55px;
+      border-radius: 10px;
+    }
 
-    h1 { font-size: 26px; margin: 0; color: #222; }
+    h1 {
+      font-size: 26px;
+      color: #222;
+      font-weight: 600;
+      margin: 0;
+    }
 
-    button {
+    .btn-scan, .btn-finalizar, .btn-novo, .produto-info button {
       display: block;
       margin: 20px auto;
       padding: 14px 25px;
@@ -41,30 +50,55 @@
       letter-spacing: 0.5px;
     }
 
-    .btn-scan, .btn-finalizar { background: #333; color: #fff; }
-    .btn-scan:hover, .btn-finalizar:hover { background: #f7941e; }
+    .btn-scan, .btn-finalizar {
+      background: #333;
+      color: #fff;
+    }
 
-    .btn-novo { background: #f7941e; color: #fff; }
-    .btn-novo:hover { background: #222; }
+    .btn-novo {
+      background: #f7941e;
+      color: #fff;
+    }
+
+    .btn-scan:hover, .btn-finalizar:hover {
+      background: #f7941e;
+      color: #fff;
+    }
+
+    .btn-novo:hover {
+      background: #222;
+      color: #fff;
+    }
 
     #reader-container {
+      position: relative;
       display: none;
       width: 320px;
       margin: 20px auto;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      position: relative;
     }
 
-    #reader { width: 100%; border-radius: 12px; }
+    #reader {
+      width: 100%;
+      border-radius: 12px;
+    }
+
     #closeCamera {
       position: absolute;
-      top: 8px; right: 8px;
-      background: #ff4d4d; color: white;
-      border: none; border-radius: 50%;
-      width: 35px; height: 35px; font-size: 18px;
+      top: 8px;
+      right: 8px;
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-weight: bold;
+      font-size: 18px;
       cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     .produto-info {
@@ -76,35 +110,105 @@
       max-width: 400px;
       margin: 10px auto;
       display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     .produto-info img {
-      width: 150px; border-radius: 10px; margin-bottom: 10px;
-      cursor: pointer; transition: transform 0.2s ease-in-out;
+      width: 150px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
     }
-    .produto-info img:hover { transform: scale(1.15); }
-    .zoomed { width: 90% !important; max-width: 400px; z-index: 9999; }
 
-    input[type=number] {
-      width: 90px; padding: 8px; font-size: 16px; text-align: center;
-      border-radius: 8px; border: 1px solid #ccc;
+    .produto-info img:hover {
+      transform: scale(1.15);
+    }
+
+    .zoomed {
+      width: 90% !important;
+      max-width: 400px;
+      z-index: 9999;
+    }
+
+    .produto-info input {
+      width: 90px;
+      padding: 8px;
+      font-size: 16px;
+      text-align: center;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin: 10px;
       -moz-appearance: textfield;
     }
 
-    input::-webkit-inner-spin-button,
-    input::-webkit-outer-spin-button { -webkit-appearance: inner-spin-button; opacity: 1; }
-
-    table {
-      width: 100%; border-collapse: collapse; margin-top: 10px;
-      background: #fff; border-radius: 10px; overflow: hidden;
+    .produto-info input::-webkit-inner-spin-button, 
+    .produto-info input::-webkit-outer-spin-button {
+      -webkit-appearance: inner-spin-button;
+      opacity: 1;
     }
 
-    th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; }
-    th { background: #333; color: #fff; text-transform: uppercase; font-size: 14px; }
-    td { font-size: 15px; color: #333; }
-    .produto-imagem { width: 60px; border-radius: 5px; cursor: pointer; }
+    .produto-info button {
+      background: #333;
+      color: #fff;
+      border-radius: 20px;
+      padding: 10px 20px;
+    }
 
-    .total { font-size: 1.4em; font-weight: bold; text-align: right; margin-top: 15px; color: #333; }
+    .produto-info button:hover {
+      background: #f7941e;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border-bottom: 1px solid #eee;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #333;
+      color: #fff;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    td {
+      color: #333;
+      font-size: 15px;
+    }
+
+    .produto-imagem {
+      width: 60px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .produto-imagem:hover {
+      transform: scale(1.4);
+    }
+
+    .total {
+      font-size: 1.4em;
+      font-weight: bold;
+      text-align: right;
+      margin-top: 15px;
+      color: #333;
+    }
 
     #pixArea {
       display: none;
@@ -116,14 +220,20 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
-    #pixQr { width: 250px; margin: 15px auto; display: block; }
+    #pixQr {
+      width: 250px;
+      margin: 15px auto;
+    }
 
-    .pixCopy {
-      cursor: pointer;
-      font-weight: bold;
-      color: #f7941e;
-      font-size: 18px;
-      text-decoration: underline;
+    textarea {
+      width: 90%;
+      height: 100px;
+      font-size: 14px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      resize: none;
+      color: #333;
     }
   </style>
 </head>
@@ -152,7 +262,9 @@
   </div>
 
   <table>
-    <thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th></tr></thead>
+    <thead>
+      <tr><th>Produto</th><th>Qtd</th><th>Preço</th></tr>
+    </thead>
     <tbody id="cart"></tbody>
   </table>
 
@@ -164,7 +276,8 @@
     <img src="Pix Qr-Code.JPG" alt="Logo Pix" style="width:120px; margin-bottom:10px;">
     <h3>Pague com Pix:</h3>
     <canvas id="pixQr"></canvas>
-    <p class="pixCopy" id="btnCopyPix">📋 Copia e Cola Pix</p>
+    <p><b>Copia e Cola Pix:</b></p>
+    <textarea id="pixCode" readonly></textarea>
     <button class="btn-novo" id="btnNovoPedido">🛒 Novo Pedido</button>
   </div>
 
@@ -178,11 +291,13 @@
       "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
+    const chavePix = "85987398273";
+    const nomeLoja = "Pit Stop JadEx Ag Aquiraz";
+
     let total = 0;
     let html5QrCode = null;
     let produtoAtual = null;
     let bloqueioLeitura = false;
-    let codigoPixGerado = "";
 
     async function pararCamera() {
       if (html5QrCode) {
@@ -196,8 +311,13 @@
     function adicionarProduto(codigo, qtd = 1) {
       const produto = produtos[codigo];
       if (!produto) return;
+
       const linha = document.createElement("tr");
-      linha.innerHTML = `<td><img src="${produto.imagem}" class="produto-imagem"> ${produto.nome}</td><td>${qtd}</td><td>R$ ${(produto.preco * qtd).toFixed(2)}</td>`;
+      linha.innerHTML = `
+        <td><img src="${produto.imagem}" class="produto-imagem"> ${produto.nome}</td>
+        <td>${qtd}</td>
+        <td>R$ ${(produto.preco * qtd).toFixed(2)}</td>
+      `;
       document.getElementById("cart").appendChild(linha);
       total += produto.preco * qtd;
       document.getElementById("total").textContent = total.toFixed(2);
@@ -230,6 +350,7 @@
       const readerDiv = document.getElementById("reader-container");
       readerDiv.style.display = "block";
       document.getElementById("btnStartScan").style.display = "none";
+
       html5QrCode = new Html5Qrcode("reader");
       try {
         await html5QrCode.start(
@@ -239,30 +360,58 @@
             if (bloqueioLeitura) return;
             bloqueioLeitura = true;
             const codigo = decodedText.trim();
-            if (produtos[codigo]) mostrarProduto(codigo);
-            else { alert("Produto não encontrado!"); bloqueioLeitura = false; }
+            if (produtos[codigo]) {
+              mostrarProduto(codigo);
+            } else {
+              alert("Produto não encontrado!");
+              bloqueioLeitura = false;
+            }
           }
         );
-      } catch {
+      } catch (err) {
         alert("Não foi possível acessar a câmera.");
       }
     });
 
     document.getElementById("closeCamera").addEventListener("click", pararCamera);
 
-    // Gera Pix via backend
-    async function gerarPixDinamico(valor) {
-      const resp = await fetch("http://localhost:3000/api/pix", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ valor })
-      });
-      const data = await resp.json();
-      return data; // { copiaECola, imagemQrcode }
+    // Função CRC16 padrão Pix
+    function crc16(payload) {
+      let polinomio = 0x1021;
+      let resultado = 0xFFFF;
+      for (let i = 0; i < payload.length; i++) {
+        resultado ^= payload.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          resultado = (resultado & 0x8000) ? (resultado << 1) ^ polinomio : (resultado << 1);
+        }
+      }
+      return (resultado & 0xFFFF).toString(16).toUpperCase().padStart(4, "0");
     }
 
-    document.getElementById("btnFinalizar").addEventListener("click", async () => {
-      if (total <= 0) { alert("Carrinho vazio!"); return; }
+    function gerarPixPayload(chave, valor, nome) {
+      valor = valor.toFixed(2);
+      const nomeFormatado = nome.substring(0, 25);
+      const payload = 
+        "000201" +
+        "26580014br.gov.bcb.pix" +
+        `0114${chave}` +
+        "52040000" +
+        "5303986" +
+        `540${valor.length}${valor}` +
+        "5802BR" +
+        `5913${nomeFormatado}` +
+        "6009SAO PAULO" +
+        "62070503***" +
+        "6304";
+      return payload + crc16(payload);
+    }
+
+    document.getElementById("btnFinalizar").addEventListener("click", () => {
+      if (total <= 0) {
+        alert("Carrinho vazio!");
+        return;
+      }
+
       pararCamera();
 
       document.getElementById("pixArea").style.display = "block";
@@ -270,17 +419,12 @@
       document.querySelector(".total").style.display = "none";
       document.getElementById("btnFinalizar").style.display = "none";
 
-      const data = await gerarPixDinamico(total.toFixed(2));
-      codigoPixGerado = data.copiaECola;
+      const payload = gerarPixPayload(chavePix, total, nomeLoja);
+      document.getElementById("pixCode").value = payload;
 
-      QRCode.toCanvas(document.getElementById("pixQr"), codigoPixGerado, { width: 250 });
-    });
-
-    document.getElementById("btnCopyPix").addEventListener("click", () => {
-      if (codigoPixGerado) {
-        navigator.clipboard.writeText(codigoPixGerado);
-        alert("✅ Código Pix copiado!");
-      }
+      setTimeout(() => {
+        QRCode.toCanvas(document.getElementById("pixQr"), payload, { width: 250 });
+      }, 300);
     });
 
     document.getElementById("btnNovoPedido").addEventListener("click", () => {
