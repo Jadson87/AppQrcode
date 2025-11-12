@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pit Stop JadEx</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
@@ -14,7 +14,6 @@
       padding: 20px;
       color: #222;
     }
-
     header {
       display: flex;
       align-items: center;
@@ -22,466 +21,210 @@
       gap: 10px;
       margin-bottom: 20px;
     }
-
     header img {
       width: 55px;
       height: 55px;
       border-radius: 10px;
     }
-
-    h1 {
-      font-size: 26px;
-      color: #222;
-      font-weight: 600;
-      margin: 0;
+    h1 { font-size: 26px; margin: 0; color: #222; }
+    .btn-scan, .btn-finalizar, .btn-novo, .produto-info button {
+      display: block; margin: 20px auto; padding: 14px 25px;
+      font-size: 16px; font-weight: bold; border: none;
+      border-radius: 30px; cursor: pointer;
+      transition: all 0.2s ease-in-out; text-transform: uppercase;
     }
-
-    .btn-scan, .btn-finalizar, .btn-novo, .btn-copiar, .produto-info button {
-      display: block;
-      margin: 20px auto;
-      padding: 14px 25px;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .btn-scan, .btn-finalizar, .btn-copiar {
-      background: #333;
-      color: #fff;
-    }
-
-    .btn-novo {
-      background: #f7941e;
-      color: #fff;
-    }
-
-    .btn-scan:hover, .btn-finalizar:hover, .btn-copiar:hover {
-      background: #f7941e;
-      color: #fff;
-    }
-
-    .btn-novo:hover {
-      background: #222;
-      color: #fff;
-    }
-
+    .btn-scan, .btn-finalizar { background: #333; color: #fff; }
+    .btn-scan:hover, .btn-finalizar:hover { background: #f7941e; }
+    .btn-novo { background: #f7941e; color: #fff; }
+    .btn-novo:hover { background: #222; }
     #reader-container {
-      position: relative;
-      display: none;
-      width: 320px;
-      margin: 20px auto;
-      border-radius: 12px;
-      overflow: hidden;
+      position: relative; display: none; width: 320px; margin: 20px auto;
+      border-radius: 12px; overflow: hidden;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
-
-    #reader {
-      width: 100%;
-      border-radius: 12px;
-    }
-
+    #reader { width: 100%; border-radius: 12px; }
     #closeCamera {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: #ff4d4d;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      font-weight: bold;
-      font-size: 18px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      position: absolute; top: 8px; right: 8px; background: #ff4d4d;
+      color: white; border: none; border-radius: 50%; width: 35px;
+      height: 35px; font-weight: bold; font-size: 18px; cursor: pointer;
     }
-
     .produto-info {
-      text-align: center;
-      background: #fff;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      max-width: 400px;
-      margin: 10px auto;
-      display: none;
-      animation: fadeIn 0.3s ease;
+      text-align: center; background: #fff; padding: 20px;
+      border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 400px; margin: 10px auto; display: none;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.98); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .produto-info img {
-      width: 150px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: transform 0.2s ease-in-out;
-    }
-
-    .produto-info img:hover {
-      transform: scale(1.15);
-    }
-
-    .zoomed {
-      width: 90% !important;
-      max-width: 400px;
-      z-index: 9999;
-    }
-
-    .quantidade-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      margin: 10px 0;
-    }
-
-    .quantidade-container button {
-      background: #333;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      font-size: 20px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .quantidade-container button:hover {
-      background: #f7941e;
-    }
-
-    .quantidade-container input {
-      width: 70px;
-      text-align: center;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      padding: 6px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    th, td {
-      border-bottom: 1px solid #eee;
-      padding: 12px;
-      text-align: left;
-    }
-
-    th {
-      background: #333;
-      color: #fff;
-      text-transform: uppercase;
-      font-size: 14px;
-    }
-
-    td {
-      color: #333;
-      font-size: 15px;
-    }
-
-    .remove-item {
-      color: #ff4d4d;
-      font-weight: bold;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .produto-imagem {
-      width: 60px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .produto-imagem:hover {
-      transform: scale(1.4);
-    }
-
-    .total {
-      font-size: 1.4em;
-      font-weight: bold;
-      text-align: right;
-      margin-top: 15px;
-      color: #333;
-    }
-
-    #pixArea {
-      display: none;
-      text-align: center;
-      margin-top: 30px;
-      background: #fff;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    #pixQr {
-      width: 250px;
-      margin: 15px auto;
-    }
-
-    #mensagemFinal {
-      display: none;
-      text-align: center;
-      font-size: 20px;
-      color: #333;
-      margin-top: 20px;
-      font-weight: 600;
-    }
+    .produto-info img { width: 150px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; }
+    .produto-info img:hover { transform: scale(1.15); }
+    .produto-info input { width: 90px; padding: 8px; font-size: 16px; text-align: center; border-radius: 8px; border: 1px solid #ccc; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 10px; overflow: hidden; }
+    th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; }
+    th { background: #333; color: #fff; }
+    td { color: #333; }
+    .produto-imagem { width: 60px; border-radius: 5px; cursor: pointer; transition: transform 0.2s ease; }
+    .produto-imagem:hover { transform: scale(1.3); }
+    .total { font-size: 1.4em; font-weight: bold; text-align: right; margin-top: 15px; color: #333; }
+    #pixArea { display: none; text-align: center; margin-top: 30px; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    #pixQr { width: 250px; margin: 15px auto; }
   </style>
 </head>
 <body>
-
-  <!-- sons -->
-  <audio id="bipScan" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_552bd33a9d.mp3?filename=beep-6-96243.mp3"></audio>
-  <audio id="bipAdd" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d4a9a3ffb6.mp3?filename=beep-22-86118.mp3"></audio>
-
   <header>
-    <img src="Logo Ge.png" alt="Logo Pit Stop JadEx">
+    <img src="Logo Ge.png" alt="Logo Pit Stop JadEx" />
     <h1>Pit Stop JadEx</h1>
   </header>
 
-  <button class="btn-scan" id="btnStartScan">📷 Escanear Produto</button>
-
+  <button class="btn-scan" id="btnStartScan">Escanear Produto</button>
   <div id="reader-container">
     <div id="reader"></div>
     <button id="closeCamera">×</button>
   </div>
 
   <div id="produtoInfo" class="produto-info">
-    <img id="produtoImg" src="" alt="">
+    <img id="produtoImg" src="" alt="" />
     <h3 id="produtoNome"></h3>
     <p id="produtoPreco"></p>
-    <div class="quantidade-container">
-      <button id="btnMenos">−</button>
-      <input type="number" id="qtdInput" min="1" max="10" value="1">
-      <button id="btnMais">+</button>
+    <div>
+      <label>Quantidade:</label>
+      <input type="number" id="qtdInput" min="1" max="10" value="1" />
+      <button id="btnAdicionarQtd">Adicionar</button>
     </div>
-    <button id="btnAdicionarQtd">Adicionar</button>
   </div>
 
   <table>
-    <thead>
-      <tr><th>Produto</th><th>Qtd</th><th>Preço</th><th></th></tr>
-    </thead>
+    <thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th></tr></thead>
     <tbody id="cart"></tbody>
   </table>
-
   <div class="total">Total: R$ <span id="total">0.00</span></div>
 
-  <button class="btn-finalizar" id="btnFinalizar">💳 Finalizar Compra</button>
+  <button class="btn-finalizar" id="btnFinalizar">Finalizar Compra</button>
 
   <div id="pixArea">
     <img src="Pix Qr-Code.JPG" alt="Logo Pix" style="width:120px; margin-bottom:10px;">
-    <h3>Pague com Pix:</h3>
-    <canvas id="pixQr"></canvas>
-    <button class="btn-copiar" id="btnCopiarPix">📋 Copiar código Pix</button>
-    <button class="btn-novo" id="btnNovoPedido">🛒 Novo Pedido</button>
+    <p><b id="copiarPix" style="cursor:pointer; color:#f7941e;">Copia e Cola Pix</b></p>
+    <div></div>
+    <button class="btn-novo" id="btnNovoPedido">Novo Pedido</button>
   </div>
-
-  <div id="mensagemFinal">🎉 Obrigado por comprar! Volte sempre! 🎉</div>
 
   <script>
     const produtos = {
-      "REF001": { nome: "Refrigerante Pepsi Lata 350 ml", preco: 3.70, imagem: "Ref Pepsi Lt 350ml.JPG" },
-      "REF002": { nome: "Refrigerante Pepsi Black Lata 350 ml", preco: 4.00, imagem: "Ref Pepsi Black Lt 350ml.JPG" },
-      "REF003": { nome: "Refrigerante Pepsi Twist Lata 350 ml", preco: 4.00, imagem: "Ref Pepsi Twist Lt 350ml.JPG" },
-      "REF004": { nome: "Refrigerante Guaraná Antártica Lata 350 ml", preco: 4.00, imagem: "Ref G Antartica Lt 350ml.JPG" },
-      "REF005": { nome: "Refrigerante Sukita Laranja Lata 350 ml", preco: 4.00, imagem: "Ref Sukita laranja Lt 350ml.JPG" },
+      "REF001": { nome: "Ref Pepsi Lt 350 ml", preco: 3.70, imagem: "Ref Pepsi Lt 350ml.JPG" },
+      "REF002": { nome: "Ref Pepsi Black Lt 350 ml", preco: 4.00, imagem: "Ref Pepsi Black Lt 350ml.JPG" },
+      "REF003": { nome: "Ref Pepsi Twist Lt 350 ml", preco: 4.00, imagem: "Ref Pepsi Twist Lt 350ml.JPG" },
+      "REF004": { nome: "Ref Guaraná Antártica Lt 350 ml", preco: 4.00, imagem: "Ref G Antartica Lt 350ml.JPG" },
+      "REF005": { nome: "Ref Sukita Laranja Lt 350 ml", preco: 4.00, imagem: "Ref Sukita laranja Lt 350ml.JPG" },
       "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
     const chavePix = "+5585987398273";
     const nomeLoja = "Pit Stop JadEx";
 
-    let total = 0;
-    let html5QrCode = null;
-    let produtoAtual = null;
-    let bloqueioLeitura = false;
-    let payload = "";
-
-    function playSound(id) {
-      const audio = document.getElementById(id);
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(() => {});
-      }
-    }
+    let total = 0, html5QrCode = null, produtoAtual = null, bloqueioLeitura = false, payloadGerado = "";
 
     async function pararCamera() {
-      if (html5QrCode) {
-        await html5QrCode.stop();
-        await html5QrCode.clear();
-      }
+      if (html5QrCode) { await html5QrCode.stop(); await html5QrCode.clear(); }
       document.getElementById("reader-container").style.display = "none";
       document.getElementById("btnStartScan").style.display = "block";
     }
 
-    function adicionarProduto(codigo, qtd = 1) {
-      const produto = produtos[codigo];
-      if (!produto) return;
-
+    function adicionarProduto(codigo, qtd=1){
+      const p = produtos[codigo];
+      if(!p) return;
       const linha = document.createElement("tr");
-      const precoFinal = produto.preco * qtd;
-
-      linha.innerHTML = `
-        <td><img src="${produto.imagem}" class="produto-imagem"> ${produto.nome}</td>
-        <td>${qtd}</td>
-        <td>R$ ${precoFinal.toFixed(2)}</td>
-        <td><span class="remove-item">❌</span></td>
-      `;
-
-      linha.querySelector(".remove-item").onclick = () => {
-        total -= precoFinal;
-        document.getElementById("total").textContent = total.toFixed(2);
-        linha.remove();
-      };
-
+      linha.innerHTML = `<td><img src="${p.imagem}" class="produto-imagem"> ${p.nome}</td><td>${qtd}</td><td>R$ ${(p.preco*qtd).toFixed(2)}</td>`;
       document.getElementById("cart").appendChild(linha);
-      total += precoFinal;
+      total += p.preco*qtd;
       document.getElementById("total").textContent = total.toFixed(2);
     }
 
-    function mostrarProduto(codigo) {
-      const produto = produtos[codigo];
-      if (!produto) return;
+    function mostrarProduto(codigo){
+      const p = produtos[codigo];
+      if(!p) return;
       produtoAtual = codigo;
-      document.getElementById("produtoImg").src = produto.imagem;
-      document.getElementById("produtoNome").textContent = produto.nome;
-      document.getElementById("produtoPreco").textContent = "Preço: R$ " + produto.preco.toFixed(2);
+      document.getElementById("produtoImg").src = p.imagem;
+      document.getElementById("produtoNome").textContent = p.nome;
+      document.getElementById("produtoPreco").textContent = "Preço: R$ "+p.preco.toFixed(2);
       document.getElementById("produtoInfo").style.display = "block";
     }
 
-    document.getElementById("btnMais").onclick = () => {
-      const input = document.getElementById("qtdInput");
-      if (input.value < 10) input.value++;
-    };
-
-    document.getElementById("btnMenos").onclick = () => {
-      const input = document.getElementById("qtdInput");
-      if (input.value > 1) input.value--;
-    };
-
-    document.getElementById("produtoImg").addEventListener("click", function() {
-      this.classList.toggle("zoomed");
-    });
-
-    document.getElementById("btnAdicionarQtd").addEventListener("click", () => {
+    document.getElementById("btnAdicionarQtd").addEventListener("click", ()=>{
       const qtd = parseInt(document.getElementById("qtdInput").value);
-      if (produtoAtual && qtd > 0) {
-        adicionarProduto(produtoAtual, qtd);
-        playSound("bipAdd");
-        document.getElementById("produtoInfo").style.display = "none";
-        bloqueioLeitura = false;
+      if(produtoAtual && qtd>0){
+        adicionarProduto(produtoAtual,qtd);
+        document.getElementById("produtoInfo").style.display="none";
+        bloqueioLeitura=false;
       }
     });
 
-    document.getElementById("btnStartScan").addEventListener("click", async () => {
-      const readerDiv = document.getElementById("reader-container");
-      readerDiv.style.display = "block";
-      document.getElementById("btnStartScan").style.display = "none";
-
+    document.getElementById("btnStartScan").addEventListener("click", async ()=>{
+      const div = document.getElementById("reader-container");
+      div.style.display="block"; document.getElementById("btnStartScan").style.display="none";
       html5QrCode = new Html5Qrcode("reader");
-      try {
-        await html5QrCode.start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: 200 },
-          (decodedText) => {
-            if (bloqueioLeitura) return;
-            bloqueioLeitura = true;
-            const codigo = decodedText.trim();
-            if (produtos[codigo]) {
-              playSound("bipScan");
-              mostrarProduto(codigo);
-            } else {
-              alert("Produto não encontrado!");
-              bloqueioLeitura = false;
-            }
-          }
-        );
-      } catch (err) {
-        alert("Não foi possível acessar a câmera.");
-      }
+      try{
+        await html5QrCode.start({facingMode:"environment"},{fps:10,qrbox:200},(decoded)=>{
+          if(bloqueioLeitura) return;
+          bloqueioLeitura=true;
+          const cod=decoded.trim();
+          produtos[cod]?mostrarProduto(cod):(alert("Produto não encontrado!"),bloqueioLeitura=false);
+        });
+      }catch(e){ alert("Não foi possível acessar a câmera."); }
     });
 
     document.getElementById("closeCamera").addEventListener("click", pararCamera);
 
-    // Função CRC16
-    function crc16(payload) {
-      let polinomio = 0x1021;
-      let resultado = 0xFFFF;
-      for (let i = 0; i < payload.length; i++) {
-        resultado ^= payload.charCodeAt(i) << 8;
-        for (let j = 0; j < 8; j++) {
-          resultado = (resultado & 0x8000) ? (resultado << 1) ^ polinomio : (resultado << 1);
-        }
+    function crc16(payload){
+      let polinomio=0x1021, resultado=0xFFFF;
+      for(let i=0;i<payload.length;i++){
+        resultado^=payload.charCodeAt(i)<<8;
+        for(let j=0;j<8;j++) resultado=(resultado&0x8000)?(resultado<<1)^polinomio:(resultado<<1);
       }
-      return (resultado & 0xFFFF).toString(16).toUpperCase().padStart(4, "0");
+      return (resultado&0xFFFF).toString(16).toUpperCase().padStart(4,"0");
     }
 
     function gerarPixPayload(chave, valor, nome) {
-      valor = valor.toFixed(2);
-      const nomeFormatado = nome.substring(0, 25);
-      const payloadSemCRC =
-        "000201" + "26580014br.gov.bcb.pix" +
-        "01" + (chave.length.toString().padStart(2,"0")) + chave +
-        "52040000" + "5303986" + `540${valor.length}${valor}` +
-        "5802BR" + `59${nomeFormatado.length}${nomeFormatado}` +
-        "6009SAO PAULO" + "62070503***" + "6304";
-      return payloadSemCRC + crc16(payloadSemCRC);
-    }
+  valor = valor.toFixed(2);
+  const nomeFormatado = nome.substring(0, 25);
 
-    document.getElementById("btnFinalizar").addEventListener("click", () => {
-      if (total <= 0) {
-        alert("Carrinho vazio!");
-        return;
-      }
+  // Campos Pix formatados
+  const gui = "00" + "14" + "br.gov.bcb.pix";
+  const chavePix = "01" + chave.length.toString().padStart(2, "0") + chave;
 
+  const merchantAccountInfo = "26" + (gui.length + chavePix.length).toString().padStart(2, "0") + gui + chavePix;
+  const campoValor = "54" + valor.length.toString().padStart(2, "0") + valor;
+  const campoNome = "59" + nomeFormatado.length.toString().padStart(2, "0") + nomeFormatado;
+
+  const payloadSemCRC =
+    "000201" + // ID do formato
+    merchantAccountInfo +
+    "52040000" + // Categoria
+    "5303986" + // Moeda BRL
+    campoValor +
+    "5802BR" + // País
+    campoNome +
+    "6009SAO PAULO" + // Cidade
+    "62070503***" + // Identificador
+    "6304"; // Início CRC
+
+  return payloadSemCRC + crc16(payloadSemCRC);
+}
+
+    document.getElementById("btnFinalizar").addEventListener("click", ()=>{
+      if(total<=0){ alert("Carrinho vazio!"); return; }
       pararCamera();
-
-      document.getElementById("pixArea").style.display = "block";
-      document.querySelector("table").style.display = "none";
-      document.querySelector(".total").style.display = "none";
-      document.getElementById("btnFinalizar").style.display = "none";
-
-      payload = gerarPixPayload(chavePix, total, nomeLoja);
-
-      setTimeout(() => {
-        QRCode.toCanvas(document.getElementById("pixQr"), payload, { width: 250 });
-      }, 300);
+      document.getElementById("pixArea").style.display="block";
+      document.querySelector("table").style.display="none";
+      document.querySelector(".total").style.display="none";
+      document.getElementById("btnFinalizar").style.display="none";
+      payloadGerado = gerarPixPayload(chavePix,total,nomeLoja);
+      QRCode.toCanvas(document.getElementById("pixQr"),payloadGerado,{width:250});
     });
 
-    document.getElementById("btnCopiarPix").onclick = () => {
-      const tempInput = document.createElement("textarea");
-      tempInput.value = payload;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-      alert("✅ Código Pix copiado com sucesso!");
-      document.getElementById("mensagemFinal").style.display = "block";
-    };
-
-    document.getElementById("btnNovoPedido").addEventListener("click", () => {
-      location.reload();
+    document.getElementById("copiarPix").addEventListener("click", ()=>{
+      if(!payloadGerado){ alert("Gere o Pix primeiro."); return; }
+      navigator.clipboard.writeText(payloadGerado);
+      alert("Código Pix copiado!");
     });
+
+    document.getElementById("btnNovoPedido").addEventListener("click", ()=>location.reload());
   </script>
 </body>
 </html>
