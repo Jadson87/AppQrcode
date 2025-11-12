@@ -27,14 +27,14 @@
       border-radius: 10px;
     }
     h1 { font-size: 26px; margin: 0; color: #222; }
-    .btn-scan, .btn-finalizar, .btn-novo, .produto-info button {
+    .btn-scan, .btn-finalizar, .btn-novo, .produto-info button, .btn-pix {
       display: block; margin: 20px auto; padding: 14px 25px;
       font-size: 16px; font-weight: bold; border: none;
       border-radius: 30px; cursor: pointer;
       transition: all 0.2s ease-in-out; text-transform: uppercase;
     }
-    .btn-scan, .btn-finalizar { background: #333; color: #fff; }
-    .btn-scan:hover, .btn-finalizar:hover { background: #f7941e; }
+    .btn-scan, .btn-finalizar, .btn-pix { background: #333; color: #fff; }
+    .btn-scan:hover, .btn-finalizar:hover, .btn-pix:hover { background: #f7941e; }
     .btn-novo { background: #f7941e; color: #fff; }
     .btn-novo:hover { background: #222; }
     #reader-container {
@@ -55,13 +55,29 @@
     }
     .produto-info img { width: 150px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; }
     .produto-info img:hover { transform: scale(1.15); }
-    .produto-info input { width: 90px; padding: 8px; font-size: 16px; text-align: center; border-radius: 8px; border: 1px solid #ccc; }
+    .qtd-box {
+      display: inline-flex; align-items: center; border: 1px solid #ccc;
+      border-radius: 8px; overflow: hidden;
+    }
+    .qtd-box button {
+      background: #f7941e; color: #fff; border: none; width: 35px;
+      height: 35px; font-size: 20px; cursor: pointer;
+    }
+    .qtd-box input {
+      width: 50px; border: none; text-align: center; font-size: 16px;
+      outline: none;
+    }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 10px; overflow: hidden; }
-    th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; }
+    th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; vertical-align: middle; }
     th { background: #333; color: #fff; }
     td { color: #333; }
     .produto-imagem { width: 60px; border-radius: 5px; cursor: pointer; transition: transform 0.2s ease; }
     .produto-imagem:hover { transform: scale(1.3); }
+    .btn-remove {
+      background: #ff4d4d; color: white; border: none;
+      border-radius: 50%; width: 30px; height: 30px;
+      font-weight: bold; font-size: 18px; cursor: pointer;
+    }
     .total { font-size: 1.4em; font-weight: bold; text-align: right; margin-top: 15px; color: #333; }
     #pixArea { display: none; text-align: center; margin-top: 30px; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     #pixQr { width: 250px; margin: 15px auto; }
@@ -85,13 +101,17 @@
     <p id="produtoPreco"></p>
     <div>
       <label>Quantidade:</label>
-      <input type="number" id="qtdInput" min="1" max="10" value="1" />
+      <div class="qtd-box">
+        <button id="btnMenos">−</button>
+        <input type="number" id="qtdInput" min="1" max="10" value="1" />
+        <button id="btnMais">+</button>
+      </div>
       <button id="btnAdicionarQtd">Adicionar</button>
     </div>
   </div>
 
   <table>
-    <thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th></tr></thead>
+    <thead><tr><th>Produto</th><th>Qtd</th><th>Preço</th><th></th></tr></thead>
     <tbody id="cart"></tbody>
   </table>
   <div class="total">Total: R$ <span id="total">0.00</span></div>
@@ -100,18 +120,21 @@
 
   <div id="pixArea">
     <img src="Pix Qr-Code.JPG" alt="Logo Pix" style="width:120px; margin-bottom:10px;">
-    <p><b id="copiarPix" style="cursor:pointer; color:#f7941e;">Copia e Cola Pix</b></p>
-    <div></div>
+    <button class="btn-pix" id="copiarPix">Copia e Cola Pix</button>
+    <div id="pixQr"></div>
     <button class="btn-novo" id="btnNovoPedido">Novo Pedido</button>
   </div>
 
   <script>
     const produtos = {
-      "REF001": { nome: "Ref Pepsi Lt 350 ml", preco: 3.70, imagem: "Ref Pepsi Lt 350ml.JPG" },
-      "REF002": { nome: "Ref Pepsi Black Lt 350 ml", preco: 4.00, imagem: "Ref Pepsi Black Lt 350ml.JPG" },
-      "REF003": { nome: "Ref Pepsi Twist Lt 350 ml", preco: 4.00, imagem: "Ref Pepsi Twist Lt 350ml.JPG" },
-      "REF004": { nome: "Ref Guaraná Antártica Lt 350 ml", preco: 4.00, imagem: "Ref G Antartica Lt 350ml.JPG" },
-      "REF005": { nome: "Ref Sukita Laranja Lt 350 ml", preco: 4.00, imagem: "Ref Sukita laranja Lt 350ml.JPG" },
+      "REF001": { nome: "Ref Pepsi Lt 350ml", preco: 3.70, imagem: "Ref Pepsi Lt 350ml.JPG" },
+      "REF002": { nome: "Ref Pepsi Black Lt 350ml", preco: 4.00, imagem: "Ref Pepsi Black Lt 350ml.JPG" },
+      "REF003": { nome: "Ref Pepsi Twist Lt 350ml", preco: 4.00, imagem: "Ref Pepsi Twist Lt 350ml.JPG" },
+      "REF004": { nome: "Ref Guaraná Antártica Lt 350ml", preco: 4.00, imagem: "Ref G Antartica Lt 350ml.JPG" },
+      "REF005": { nome: "Ref Sukita Laranja Lt 350ml", preco: 4.00, imagem: "Ref Sukita laranja Lt 350ml.JPG" },
+      "REF006": { nome: "Ref Sukita Uva Lt 350ml", preco: 4.00, imagem: "Ref Sukita Uva Lt 350ml.JPG" },
+      "REF007": { nome: "Ref Soda Limonada Lt 350ml", preco: 4.00, imagem: "Ref Soda Limonada Lt 350ml.JPG" },
+      "REF008": { nome: "Ref G Antártica Zero Lt 350ml", preco: 4.00, imagem: "Ref G Antártica Zero Lt 350ml.JPG" },
       "SAL001": { nome: "Salgadinho", preco: 5.00, imagem: "salgadinho.jpg" }
     };
 
@@ -126,14 +149,33 @@
       document.getElementById("btnStartScan").style.display = "block";
     }
 
+    function atualizarTotal(){
+      total = 0;
+      document.querySelectorAll("#cart tr").forEach(tr=>{
+        const preco = parseFloat(tr.dataset.preco);
+        const qtd = parseInt(tr.dataset.qtd);
+        total += preco * qtd;
+      });
+      document.getElementById("total").textContent = total.toFixed(2);
+    }
+
     function adicionarProduto(codigo, qtd=1){
       const p = produtos[codigo];
       if(!p) return;
       const linha = document.createElement("tr");
-      linha.innerHTML = `<td><img src="${p.imagem}" class="produto-imagem"> ${p.nome}</td><td>${qtd}</td><td>R$ ${(p.preco*qtd).toFixed(2)}</td>`;
+      linha.dataset.preco = p.preco;
+      linha.dataset.qtd = qtd;
+      linha.innerHTML = `
+        <td><img src="${p.imagem}" class="produto-imagem"> ${p.nome}</td>
+        <td>${qtd}</td>
+        <td>R$ ${(p.preco*qtd).toFixed(2)}</td>
+        <td><button class="btn-remove">×</button></td>`;
+      linha.querySelector(".btn-remove").addEventListener("click", ()=>{
+        linha.remove();
+        atualizarTotal();
+      });
       document.getElementById("cart").appendChild(linha);
-      total += p.preco*qtd;
-      document.getElementById("total").textContent = total.toFixed(2);
+      atualizarTotal();
     }
 
     function mostrarProduto(codigo){
@@ -145,6 +187,15 @@
       document.getElementById("produtoPreco").textContent = "Preço: R$ "+p.preco.toFixed(2);
       document.getElementById("produtoInfo").style.display = "block";
     }
+
+    document.getElementById("btnMais").onclick = ()=> {
+      const input = document.getElementById("qtdInput");
+      if(parseInt(input.value) < 10) input.value = parseInt(input.value)+1;
+    };
+    document.getElementById("btnMenos").onclick = ()=> {
+      const input = document.getElementById("qtdInput");
+      if(parseInt(input.value) > 1) input.value = parseInt(input.value)-1;
+    };
 
     document.getElementById("btnAdicionarQtd").addEventListener("click", ()=>{
       const qtd = parseInt(document.getElementById("qtdInput").value);
@@ -181,31 +232,20 @@
     }
 
     function gerarPixPayload(chave, valor, nome) {
-  valor = valor.toFixed(2);
-  const nomeFormatado = nome.substring(0, 25);
-
-  // Campos Pix formatados
-  const gui = "00" + "14" + "br.gov.bcb.pix";
-  const chavePix = "01" + chave.length.toString().padStart(2, "0") + chave;
-
-  const merchantAccountInfo = "26" + (gui.length + chavePix.length).toString().padStart(2, "0") + gui + chavePix;
-  const campoValor = "54" + valor.length.toString().padStart(2, "0") + valor;
-  const campoNome = "59" + nomeFormatado.length.toString().padStart(2, "0") + nomeFormatado;
-
-  const payloadSemCRC =
-    "000201" + // ID do formato
-    merchantAccountInfo +
-    "52040000" + // Categoria
-    "5303986" + // Moeda BRL
-    campoValor +
-    "5802BR" + // País
-    campoNome +
-    "6009SAO PAULO" + // Cidade
-    "62070503***" + // Identificador
-    "6304"; // Início CRC
-
-  return payloadSemCRC + crc16(payloadSemCRC);
-}
+      valor = valor.toFixed(2);
+      const nomeFormatado = nome.substring(0, 25);
+      const gui = "00" + "14" + "br.gov.bcb.pix";
+      const chavePix = "01" + chave.length.toString().padStart(2, "0") + chave;
+      const merchantAccountInfo = "26" + (gui.length + chavePix.length).toString().padStart(2, "0") + gui + chavePix;
+      const campoValor = "54" + valor.length.toString().padStart(2, "0") + valor;
+      const campoNome = "59" + nomeFormatado.length.toString().padStart(2, "0") + nomeFormatado;
+      const payloadSemCRC =
+        "000201" + merchantAccountInfo +
+        "52040000" + "5303986" + campoValor +
+        "5802BR" + campoNome +
+        "6009SAO PAULO" + "62070503***" + "6304";
+      return payloadSemCRC + crc16(payloadSemCRC);
+    }
 
     document.getElementById("btnFinalizar").addEventListener("click", ()=>{
       if(total<=0){ alert("Carrinho vazio!"); return; }
