@@ -353,8 +353,10 @@ function mostrarTelaConferencia() {
 
   // some após 40 segundos
   setTimeout(() => {
-    tela.innerHTML = "<h2>Pedido encerrado</h2>";
-  }, 40000);
+    setTimeout(() => {
+  tela.innerHTML = "<h2>Pedido encerrado</h2>";
+  tela.style.background = "#444";
+}, 40000);
 }
 
   </script>
