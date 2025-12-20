@@ -6,7 +6,41 @@
   <title>Pit Stop JadEx</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-  <style>
+<style>
+    #telaConferencia {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #1faa59;
+  color: #fff;
+  z-index: 9999;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+#telaConferencia h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+#listaConferencia {
+  background: rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 15px;
+  max-width: 420px;
+  margin: 0 auto 15px;
+  text-align: left;
+}
+
+#listaConferencia div {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+#infoConferencia {
+  font-size: 16px;
+  opacity: 0.9;
+}
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #f4f4f4;
@@ -84,6 +118,13 @@
   </style>
 </head>
 <body>
+  <div id="telaConferencia">
+  <h2>✅ COMPRA FINALIZADA</h2>
+
+  <div id="listaConferencia"></div>
+
+  <div id="infoConferencia"></div>
+</div>
   <header>
     <img src="Logo Ge.png" alt="Logo Pit Stop JadEx" />
     <h1>Pit Stop JadEx</h1>
@@ -264,6 +305,8 @@
       document.getElementById("btnFinalizar").style.display="none";
       payloadGerado = gerarPixPayload(chavePix,total,nomeLoja);
       QRCode.toCanvas(document.getElementById("pixQr"),payloadGerado,{width:250});
+mostrarTelaConferencia();
+
     });
 
     document.getElementById("copiarPix").addEventListener("click", ()=>{
@@ -284,6 +327,35 @@ window.addEventListener("load", () => {
   }
 });
 
+function mostrarTelaConferencia() {
+  const tela = document.getElementById("telaConferencia");
+  const lista = document.getElementById("listaConferencia");
+  const info = document.getElementById("infoConferencia");
+
+  lista.innerHTML = "";
+
+  document.querySelectorAll("#cart tr").forEach(tr => {
+    const nome = tr.querySelector("td").innerText;
+    const qtd = tr.dataset.qtd;
+    lista.innerHTML += `<div>${nome} — x${qtd}</div>`;
+  });
+
+  const agora = new Date();
+  const hora = agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+  info.innerHTML = `
+    <strong>Total:</strong> R$ ${total.toFixed(2)}<br>
+    <strong>Hora:</strong> ${hora}<br><br>
+    Mostre esta tela antes de sair
+  `;
+
+  tela.style.display = "block";
+
+  // some após 40 segundos
+  setTimeout(() => {
+    tela.innerHTML = "<h2>Pedido encerrado</h2>";
+  }, 40000);
+}
 
   </script>
 </body>
